@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32804.467
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rillium.Script", "Rillium.Script\Rillium.Script.csproj", "{A8F08C95-9AF3-459F-9B61-8B027B550DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rillium.Script.Test", "Rillium.Script.Test\Rillium.Script.Test.csproj", "{08F41CC6-F4DD-412E-9BD5-668CD16277D5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8F08C95-9AF3-459F-9B61-8B027B550DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F08C95-9AF3-459F-9B61-8B027B550DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F08C95-9AF3-459F-9B61-8B027B550DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F08C95-9AF3-459F-9B61-8B027B550DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08F41CC6-F4DD-412E-9BD5-668CD16277D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08F41CC6-F4DD-412E-9BD5-668CD16277D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08F41CC6-F4DD-412E-9BD5-668CD16277D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08F41CC6-F4DD-412E-9BD5-668CD16277D5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E3C33E5C-841D-4735-86EE-6D837D18BAC5}
+	EndGlobalSection
+EndGlobal
