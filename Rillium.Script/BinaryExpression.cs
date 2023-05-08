@@ -18,11 +18,22 @@
             return visitor.VisitBinaryExpression(this);
         }
 
-        public LiteralExpression TryReduce()
+        public override Expression Evaluate()
         {
-            if (!(Left is LiteralExpression ll && Right is LiteralExpression lr)) { return null; }
+            var left = Left.Evaluate();
+            var right = Left.Evaluate();
 
-            return new LiteralExpression(Eval(ll, lr));
+            if (left is LiteralExpression le && right is LiteralExpression ler)
+            {
+                return new LiteralExpression(Eval(le, ler));
+            }
+
+            if (left is NumberExpression len && right is NumberExpression lern)
+            {
+                return Eval(len, lern);
+            }
+
+            throw new ArgumentException("can evaluate binary expression.");
         }
 
         private LiteralValue Eval(LiteralExpression ll, LiteralExpression lr)
@@ -53,6 +64,25 @@
                 case TokenType.Plus:
                     lvd.Value = ll.Value.ToString() + lr.Value.ToString();
                     return lvd;
+                default:
+                    throw new Exception($"Unsupported operator: {Operator}");
+            }
+        }
+
+
+        private NumberExpression Eval(NumberExpression ll, NumberExpression lr) =>
+            new NumberExpression(Ev(ll.Value, lr.Value));
+
+        private double Ev(double l, double r)
+        {
+            switch (Operator)
+            {
+                case TokenType.Plus: return l + r;
+                case TokenType.Minus: return l - r;
+                case TokenType.Star: return l * r;
+                case TokenType.Slash: return l / r;
+                case TokenType.EqualEqual: return (l == r) ? 1 : 0;
+                // Handle other operators
                 default:
                     throw new Exception($"Unsupported operator: {Operator}");
             }

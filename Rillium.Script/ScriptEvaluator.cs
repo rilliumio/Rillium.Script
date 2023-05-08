@@ -20,9 +20,30 @@
             return double.Parse(expression.Value?.ToString() ?? "NaN");
         }
 
-        public void EvaluateStatement()
+        public string EvaluateStatement()
         {
-            var s = _parser.ParseStatements();
+            using (var m = new MemoryStream())
+            {
+                using (var w = new StreamWriter(m))
+                {
+                    _parser.ParseStatements(w);
+                    w.Flush();
+
+
+                    // Reset the stream position to the beginning
+                    m.Seek(0, SeekOrigin.Begin);
+
+                    using (var sr = new StreamReader(m))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
+
+        public void Evaluate(StreamWriter w)
+        {
+            _parser.ParseStatements(w);
         }
     }
 }

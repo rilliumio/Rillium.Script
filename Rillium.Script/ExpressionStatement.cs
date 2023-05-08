@@ -9,6 +9,11 @@
             Expression = expression;
         }
 
+        public override void Execute()
+        {
+            Expression.Evaluate();
+        }
+
         public override T Accept<T>(IStatementVisitor<T> visitor)
         {
             return visitor.VisitExpressionStatement(this);

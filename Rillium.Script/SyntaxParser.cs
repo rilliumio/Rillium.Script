@@ -5,6 +5,7 @@
         private readonly Lexer lexer;
         private Token currentToken;
         private IDictionary<string, LiteralValue> _vars;
+        private StreamWriter ouput;
 
         public SyntaxParser(Lexer lexer)
         {
@@ -12,16 +13,39 @@
             currentToken = lexer.NextToken();
         }
 
-        public List<Statement> ParseStatements()
+        public delegate void StatementHandler(Statement statement);
+
+        public void ParseStatements(StreamWriter output)
+        {
+            ouput = output;
+            var scope = new Scope();
+
+            while (true)
+            {
+                EatSemiColons();
+                if (currentToken.Type == TokenType.Eof) { return; }
+
+                var statement = ParseStatement(scope);
+                statement.Execute();
+
+                if (currentToken.Type == TokenType.Eof || statement == null) { break; }
+                EatSemiColons();
+            }
+        }
+
+        public List<Statement> ParseStatements(Scope scope)
         {
             var statements = new List<Statement>();
 
             while (currentToken.Type != TokenType.Eof)
             {
                 EatSemiColons();
+                if (currentToken.Type == TokenType.Eof) { break; }
 
-                statements.Add(ParseStatement());
+                var statement = ParseStatement(scope);
 
+                if (currentToken.Type == TokenType.Eof || statement == null) { break; }
+                statements.Add(statement);
                 EatSemiColons();
             }
 
@@ -136,7 +160,7 @@
             }
         }
 
-        public DeclarationStatement ParseDeclarationStatement()
+        public DeclarationStatement ParseDeclarationStatement(Scope scope)
         {
             Eat(TokenType.Var);
             var indentifier = currentToken;
@@ -146,11 +170,11 @@
             // Parse expression
             var initializer = ParseExpression();
 
-            return new DeclarationStatement(indentifier, initializer);
+            return new DeclarationStatement(scope, indentifier, initializer);
         }
 
         // Parse an if statement
-        public IfStatement ParseIfStatement()
+        public IfStatement ParseIfStatement(Scope scope)
         {
             Eat(TokenType.If);
             Eat(TokenType.LeftParen);
@@ -158,12 +182,12 @@
             Eat(TokenType.RightParen);
 
 
-            var thenStatement = ParseBlockStatement();
+            var thenStatement = ParseBlockStatement(scope);
             Statement elseStatement = null;
             if (currentToken.Type == TokenType.Else)
             {
                 Eat(TokenType.Else);
-                elseStatement = ParseBlockStatement();
+                elseStatement = ParseBlockStatement(scope);
             }
             return new IfStatement(condition, thenStatement, elseStatement);
         }
@@ -177,8 +201,7 @@
             if (currentToken.Type == TokenType.Semicolon)
             {
                 Eat(TokenType.Semicolon);
-                var ex = ParseExpression();
-                return new ExpressionStatement(ex);
+                return new ExpressionStatement(new VariableExpression(identifier));
             }
 
             Eat(TokenType.Equal);
@@ -188,17 +211,17 @@
         }
 
         // Parse a for loop statement
-        public ForLoopStatement ParseForLoopStatement()
+        public ForLoopStatement ParseForLoopStatement(Scope scope)
         {
             Eat(TokenType.For);
             Eat(TokenType.LeftParen);
-            var init = ParseStatement();
+            var init = ParseStatement(scope);
             Eat(TokenType.Semicolon);
             var condition = ParseExpression();
             Eat(TokenType.Semicolon);
-            var increment = ParseStatement();
+            var increment = ParseStatement(scope);
             Eat(TokenType.RightParen);
-            var body = ParseBlockStatement();
+            var body = ParseBlockStatement(scope);
             return new ForLoopStatement(init, condition, increment, body);
         }
 
@@ -222,15 +245,13 @@
                 Eat(op.Type);
 
                 var right = ParsePrimaryExpression();
-                var b = new BinaryExpression(expr, op.Type, right);
-                var reduced = b.TryReduce();
-                expr = (reduced != null) ? reduced : b;
+                expr = new BinaryExpression(expr, op.Type, right);
             }
 
             return expr;
         }
 
-        private Expression ParsePrimaryExpression()
+        private Expression? ParsePrimaryExpression()
         {
             var token = currentToken;
             switch (token.Type)
@@ -273,7 +294,7 @@
         }
 
 
-        private BlockStatement ParseBlockStatement()
+        private BlockStatement ParseBlockStatement(Scope scope)
         {
             var statements = new List<Statement>();
 
@@ -284,7 +305,7 @@
                 currentToken.Type != TokenType.Semicolon &&
                 currentToken.Type != TokenType.Eof)
             {
-                statements.Add(ParseStatement());
+                statements.Add(ParseStatement(scope));
 
             }
 
@@ -299,24 +320,32 @@
         }
 
         // Parse a statement
-        public Statement ParseStatement()
+        public Statement? ParseStatement(Scope scope)
         {
             switch (currentToken.Type)
             {
                 case TokenType.Var:
-                    return ParseDeclarationStatement();
+                    return ParseDeclarationStatement(scope);
                 case TokenType.If:
-                    return ParseIfStatement();
+                    return ParseIfStatement(scope);
                 case TokenType.LeftBrace:
-                    return ParseBlockStatement();
+                    return ParseBlockStatement(scope);
                 case TokenType.For:
-                    return ParseForLoopStatement();
+                    return ParseForLoopStatement(scope);
                 case TokenType.Identifier:
                     return ParseIdentifierStatement();
                 case TokenType.Semicolon:
                     return new ExpressionStatement(new LiteralExpression(null));
+                case TokenType.Number:
+                    var n = currentToken;
+                    Eat(TokenType.Number);
+
+                    return new ExpressionStatement(
+                        new LiteralExpression(
+                            new LiteralValue() { TypeId = LiteralTypeId.Number, Value = n.Value }));
+
                 case TokenType.Eof:
-                    return new ExpressionStatement(new LiteralExpression(null));
+                    return null;
                 default:
                     throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting a statement");
             }
@@ -343,4 +372,16 @@
         }
     }
 
+    public interface StatementHandler
+    {
+        void HandleStatement(Statement statement);
+    }
+
+    public class PrintStatementHandler : StatementHandler
+    {
+        public void HandleStatement(Statement statement)
+        {
+            Console.WriteLine(statement);
+        }
+    }
 }

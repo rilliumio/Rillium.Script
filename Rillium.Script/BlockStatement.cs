@@ -13,6 +13,13 @@
         {
             return visitor.VisitBlockStatement(this);
         }
-    }
 
+        public override void Execute()
+        {
+            foreach (var statement in Statements)
+            {
+                statement.Execute();
+            }
+        }
+    }
 }

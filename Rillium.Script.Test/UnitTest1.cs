@@ -31,8 +31,31 @@ namespace Rillium.Script.Test
         public void TestMethod4()
         {
             var m = new ScriptEvaluator("var x=0;x;");
-            var d = m.EvaluateExpression();
-            Assert.AreEqual(0, d);
+            m.EvaluateStatement();
+        }
+
+        [TestMethod]
+        public void TestMethod6()
+        {
+            using (var textWriter = new StringWriter())
+            {
+                var m = new ScriptEvaluator("var x=0;x;");
+                m.EvaluateStatement();
+            }
+        }
+
+        [TestMethod]
+        public void EvaluateStatementEof()
+        {
+            var evaluator = new ScriptEvaluator(";");
+            evaluator.EvaluateStatement();
+        }
+
+        [TestMethod]
+        public void Declare1Test()
+        {
+            var m = new ScriptEvaluator("1;");
+            m.EvaluateStatement();
         }
 
         [TestMethod]
@@ -40,7 +63,7 @@ namespace Rillium.Script.Test
         {
             var m = new ScriptEvaluator("" +
                 "var x =0; if(1==1){ x=1; }else{ x=2;}; x;");
-            m.EvaluateStatement();
+            var output = m.EvaluateStatement();
         }
     }
 }

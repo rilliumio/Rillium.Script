@@ -13,6 +13,18 @@
             ElseStatement = elseStatement;
         }
 
+        public override void Execute()
+        {
+            if (Condition.EvaluateToBool())
+            {
+                ThenStatement.Execute();
+            }
+            else if (ElseStatement != null)
+            {
+                ElseStatement.Execute();
+            }
+        }
+
         public override T Accept<T>(IStatementVisitor<T> visitor)
         {
             return visitor.VisitIfStatement(this);
