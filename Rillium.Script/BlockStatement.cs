@@ -14,11 +14,11 @@
             return visitor.VisitBlockStatement(this);
         }
 
-        public override void Execute()
+        public override void Execute(Scope scope)
         {
             foreach (var statement in Statements)
             {
-                statement.Execute();
+                statement.Execute(scope);
             }
         }
     }

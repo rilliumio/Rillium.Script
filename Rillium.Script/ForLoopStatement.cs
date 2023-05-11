@@ -19,19 +19,19 @@
             Body = body;
         }
 
-        public override void Execute()
+        public override void Execute(Scope scope)
         {
             // Evaluate the initial expression
-            Initialization.Execute();
+            Initialization.Execute(scope);
 
             // Loop while the condition is true
             while (Condition.EvaluateToBool())
             {
                 // Execute the loop body
-                Body.Execute();
+                Body.Execute(scope);
 
                 // Evaluate the increment expression
-                Iteration.Execute();
+                Iteration.Execute(scope);
             }
         }
 

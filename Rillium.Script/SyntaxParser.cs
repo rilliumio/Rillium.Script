@@ -26,7 +26,7 @@
                 if (currentToken.Type == TokenType.Eof) { return; }
 
                 var statement = ParseStatement(scope);
-                statement.Execute();
+                statement.Execute(scope);
 
                 if (currentToken.Type == TokenType.Eof || statement == null) { break; }
                 EatSemiColons();
@@ -72,7 +72,7 @@
                 var op = currentToken;
                 Eat(op.Type);
                 var rightExpr = ParseTerm();
-                leftExpr = new BinaryExpression(leftExpr, currentToken.Type, rightExpr);
+                leftExpr = new BinaryExpression(leftExpr, op.Type, rightExpr);
             }
             return leftExpr;
         }
@@ -170,7 +170,7 @@
             // Parse expression
             var initializer = ParseExpression();
 
-            return new DeclarationStatement(scope, indentifier, initializer);
+            return new DeclarationStatement(indentifier, initializer);
         }
 
         // Parse an if statement

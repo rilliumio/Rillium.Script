@@ -2,21 +2,18 @@
 {
     public class DeclarationStatement : Statement
     {
-        public Scope scope { get; }
         public Token Identifier { get; }
         public Expression Initializer { get; }
 
         public DeclarationStatement(
-            Scope scope,
             Token identifier,
             Expression initializer)
         {
-            this.scope = scope;
             Identifier = identifier;
             Initializer = initializer;
         }
 
-        public override void Execute()
+        public override void Execute(Scope scope)
         {
             // Evaluate the initializer expression, if present
             var value = Initializer != null ? Initializer.EvaluateToLiteral() : null;

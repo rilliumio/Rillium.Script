@@ -13,15 +13,15 @@
             ElseStatement = elseStatement;
         }
 
-        public override void Execute()
+        public override void Execute(Scope scope)
         {
             if (Condition.EvaluateToBool())
             {
-                ThenStatement.Execute();
+                ThenStatement.Execute(scope);
             }
             else if (ElseStatement != null)
             {
-                ElseStatement.Execute();
+                ElseStatement.Execute(scope);
             }
         }
 

@@ -9,9 +9,25 @@
             Expression = expression;
         }
 
-        public override void Execute()
+        public override void Execute(Scope scope)
         {
-            Expression.Evaluate();
+            var e = Expression.Evaluate();
+
+            if (e is AssignmentExpression ae)
+            {
+                ae.Set(scope);
+                return;
+            }
+
+            // TODO: Should this be supported?
+            // example: var x = 1; x; where this handles the final x;
+            if (e is VariableExpression ve)
+            {
+                scope.Set(nameof(VariableExpression), scope.Get(ve.Name.Value));
+                return;
+            }
+
+            throw new NotImplementedException("No handled");
         }
 
         public override T Accept<T>(IStatementVisitor<T> visitor)

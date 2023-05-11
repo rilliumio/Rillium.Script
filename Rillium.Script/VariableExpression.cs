@@ -8,8 +8,8 @@
         {
             Name = name;
         }
-        public override LiteralExpression Evaluate() =>
-           throw new NotImplementedException();
+
+        public override VariableExpression Evaluate() => this;
 
         public override T Accept<T>(IExpressionVisitor<T> visitor)
         {
