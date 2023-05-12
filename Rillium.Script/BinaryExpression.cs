@@ -21,7 +21,7 @@
         public override Expression Evaluate()
         {
             var left = Left.Evaluate();
-            var right = Left.Evaluate();
+            var right = Right.Evaluate();
 
             if (left is LiteralExpression le && right is LiteralExpression ler)
             {
@@ -33,7 +33,7 @@
                 return Eval(len, lern);
             }
 
-            throw new ArgumentException("can evaluate binary expression.");
+            throw new ArgumentException("Invalid binary expression.");
         }
 
         private LiteralValue Eval(LiteralExpression ll, LiteralExpression lr)

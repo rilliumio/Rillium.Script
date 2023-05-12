@@ -98,6 +98,7 @@
                     if (word == "else") { return new Token(TokenType.Else, null); }
                     if (word == "for") { return new Token(TokenType.For, null); }
                     if (word == "var") { return new Token(TokenType.Var, null); }
+                    if (word == "return") { return new Token(TokenType.Return, null); }
 
                     return new Token(TokenType.Identifier, word);
                 }

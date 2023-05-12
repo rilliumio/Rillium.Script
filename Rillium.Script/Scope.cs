@@ -9,6 +9,9 @@
             return store[key];
         }
 
+        public bool TryGet(string key, out object value) =>
+            store.TryGetValue(key, out value);
+
         public void Set(string key, object value)
         {
             store[key] = value;

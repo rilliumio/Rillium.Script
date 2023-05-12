@@ -1,69 +1,95 @@
 namespace Rillium.Script.Test
 {
     [TestClass]
-    public class UnitTest1
+    public class PrimitiveExpressionsTests
     {
+        [TestMethod]
+        public void SingleValue()
+        {
+
+            Assert.AreEqual(expected: (byte)1, Evaluator.Evaluate<byte>("1"));
+            Assert.AreEqual(expected: (byte)1, Evaluator.Evaluate<byte>("1;"));
+            Assert.AreEqual(expected: (byte)1, Evaluator.Evaluate<byte>("return 1;"));
+
+            Assert.AreEqual(expected: (short)1, Evaluator.Evaluate<short>("1"));
+            Assert.AreEqual(expected: (short)1, Evaluator.Evaluate<short>("1;"));
+            Assert.AreEqual(expected: (short)1, Evaluator.Evaluate<short>("return 1;"));
+
+            Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("1"));
+            Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("1;"));
+            Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("return 1;"));
+
+            Assert.AreEqual(expected: long.MaxValue, Evaluator.Evaluate<long>($"{long.MaxValue}L"));
+            Assert.AreEqual(expected: long.MaxValue, Evaluator.Evaluate<long>($"{long.MaxValue};"));
+            Assert.AreEqual(expected: long.MaxValue, Evaluator.Evaluate<long>($"return {long.MaxValue};"));
+
+            Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("1"));
+            Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("1;"));
+            Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("return 1;"));
+
+            Assert.AreEqual(expected: 1f, Evaluator.Evaluate<float>("1"));
+            Assert.AreEqual(expected: 1f, Evaluator.Evaluate<float>("1;"));
+            Assert.AreEqual(expected: 1f, Evaluator.Evaluate<float>("return 1;"));
+        }
+
         [TestMethod]
         public void TestMethod1()
         {
-            var m = new ScriptEvaluator("1+(2+2)");
-            var d = m.EvaluateExpression();
-            Assert.AreEqual(5, d);
+            Assert.AreEqual(
+                expected: 5,
+                Evaluator.Evaluate<int>("1+(2+2)"));
         }
 
         [TestMethod]
         public void TestMethod2()
         {
-            var m = new ScriptEvaluator("2*(1+2)");
-            var d = m.EvaluateExpression();
-            Assert.AreEqual(6, d);
+            Assert.AreEqual(
+                expected: 6,
+                Evaluator.Evaluate<int>("2*(1+2)"));
         }
 
         [TestMethod]
         public void TestMethod3()
         {
-            var m = new ScriptEvaluator("2/(1+2)");
-            var d = m.EvaluateExpression();
-            Assert.AreEqual(2.0 / 3.0, d);
+            Assert.AreEqual(
+               expected: 2.0 / 3.0,
+               Evaluator.Evaluate<int>("2/(1+2)"));
         }
 
         [TestMethod]
         public void TestMethod4()
         {
-            var m = new ScriptEvaluator("var x=0;x;");
-            m.EvaluateStatement();
-        }
-
-        [TestMethod]
-        public void TestMethod6()
-        {
-            using (var textWriter = new StringWriter())
-            {
-                var m = new ScriptEvaluator("var x=0;x;");
-                m.EvaluateStatement();
-            }
+            Assert.AreEqual(
+              expected: 7,
+              Evaluator.Evaluate<int>("var x=7;x;"));
         }
 
         [TestMethod]
         public void EvaluateStatementEof()
         {
-            var evaluator = new ScriptEvaluator(";");
-            evaluator.EvaluateStatement();
+            Assert.AreEqual(
+            expected: 1,
+            Evaluator.Evaluate<int>("1;"));
         }
 
         [TestMethod]
-        public void Declare1Test()
+        public void IfThenCorrectly()
         {
-            var m = new ScriptEvaluator("1;");
-            m.EvaluateStatement();
+            const string source = "var x =0; if(1==1){ x=1; }else{ x=2;}; x;";
+
+            Assert.AreEqual(
+                expected: 1,
+                Evaluator.Evaluate<int>(source));
         }
 
         [TestMethod]
-        public void DeclareTest()
+        public void IfElseCorrectly()
         {
-            var m = new ScriptEvaluator("" +
-                "var x =0; if(1==1){ x=1; }else{ x=2;}; x;");
-            var output = m.EvaluateStatement();
+            const string source = "var x =0; if(1==10){ x=1; }else{ x=2;}; x;";
+
+            Assert.AreEqual(
+                expected: 2,
+                Evaluator.Evaluate<int>(source));
         }
     }
 }

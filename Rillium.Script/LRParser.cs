@@ -2,9 +2,9 @@
 {
     public class LRParser
     {
-        private List<Tuple<int, string, int>> parsingTable;
-        private Stack<int> stateStack;
-        private Stack<string> symbolStack;
+        private readonly List<Tuple<int, string, int>> parsingTable;
+        private readonly Stack<int> stateStack;
+        private readonly Stack<string> symbolStack;
 
         public LRParser()
         {

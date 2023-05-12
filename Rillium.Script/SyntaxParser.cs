@@ -4,52 +4,47 @@
     {
         private readonly Lexer lexer;
         private Token currentToken;
-        private IDictionary<string, LiteralValue> _vars;
-        private StreamWriter ouput;
+        private readonly StreamWriter ouput;
 
-        public SyntaxParser(Lexer lexer)
+        public SyntaxParser(Lexer lexer, StreamWriter ouput)
         {
             this.lexer = lexer;
+            this.ouput = ouput;
             currentToken = lexer.NextToken();
         }
 
         public delegate void StatementHandler(Statement statement);
 
-        public void ParseStatements(StreamWriter output)
+        public object Parse()
         {
-            ouput = output;
             var scope = new Scope();
 
             while (true)
             {
                 EatSemiColons();
-                if (currentToken.Type == TokenType.Eof) { return; }
+                if (currentToken.Type == TokenType.Eof) { break; }
 
                 var statement = ParseStatement(scope);
+                if (statement is ReturnStatement returnStatement)
+                {
+                    return returnStatement.EvaluateReturnExpression();
+                }
+
                 statement.Execute(scope);
 
                 if (currentToken.Type == TokenType.Eof || statement == null) { break; }
                 EatSemiColons();
+
             }
-        }
 
-        public List<Statement> ParseStatements(Scope scope)
-        {
-            var statements = new List<Statement>();
+            ouput.Flush();
 
-            while (currentToken.Type != TokenType.Eof)
+            if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
             {
-                EatSemiColons();
-                if (currentToken.Type == TokenType.Eof) { break; }
-
-                var statement = ParseStatement(scope);
-
-                if (currentToken.Type == TokenType.Eof || statement == null) { break; }
-                statements.Add(statement);
-                EatSemiColons();
+                return outputValue;
             }
 
-            return statements;
+            return null;
         }
 
         private void EatSemiColons()
@@ -60,8 +55,7 @@
             }
         }
 
-        // Parse an arithmetic expression
-        public Expression ParseArithmeticExpression()
+        private Expression ParseArithmeticExpression()
         {
             var leftExpr = ParseTerm();
 
@@ -160,7 +154,7 @@
             }
         }
 
-        public DeclarationStatement ParseDeclarationStatement(Scope scope)
+        private DeclarationStatement ParseDeclarationStatement(Scope scope)
         {
             Eat(TokenType.Var);
             var indentifier = currentToken;
@@ -173,8 +167,14 @@
             return new DeclarationStatement(indentifier, initializer);
         }
 
+        private ReturnStatement ParseReturnStatement()
+        {
+            Eat(TokenType.Return);
+            return new ReturnStatement(ParseExpression());
+        }
+
         // Parse an if statement
-        public IfStatement ParseIfStatement(Scope scope)
+        private IfStatement ParseIfStatement(Scope scope)
         {
             Eat(TokenType.If);
             Eat(TokenType.LeftParen);
@@ -193,7 +193,7 @@
         }
 
         // Parse a for loop statement
-        public ExpressionStatement ParseIdentifierStatement()
+        private ExpressionStatement ParseIdentifierStatement()
         {
             var identifier = currentToken;
             Eat(TokenType.Identifier);
@@ -211,7 +211,7 @@
         }
 
         // Parse a for loop statement
-        public ForLoopStatement ParseForLoopStatement(Scope scope)
+        private ForLoopStatement ParseForLoopStatement(Scope scope)
         {
             Eat(TokenType.For);
             Eat(TokenType.LeftParen);
@@ -232,7 +232,7 @@
             return new ExpressionStatement(expression);
         }
 
-        public Expression ParseExpression()
+        private Expression ParseExpression()
         {
             var expr = ParsePrimaryExpression();
 
@@ -320,7 +320,7 @@
         }
 
         // Parse a statement
-        public Statement? ParseStatement(Scope scope)
+        private Statement? ParseStatement(Scope scope)
         {
             switch (currentToken.Type)
             {
@@ -344,6 +344,8 @@
                         new LiteralExpression(
                             new LiteralValue() { TypeId = LiteralTypeId.Number, Value = n.Value }));
 
+                case TokenType.Return:
+                    return ParseReturnStatement();
                 case TokenType.Eof:
                     return null;
                 default:

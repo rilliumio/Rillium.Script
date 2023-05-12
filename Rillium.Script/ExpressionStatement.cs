@@ -23,7 +23,13 @@
             // example: var x = 1; x; where this handles the final x;
             if (e is VariableExpression ve)
             {
-                scope.Set(nameof(VariableExpression), scope.Get(ve.Name.Value));
+                scope.Set(Constants.OutputValueKey, scope.Get(ve.Name.Value));
+                return;
+            }
+
+            if (e is NumberExpression ne)
+            {
+                scope.Set(Constants.OutputValueKey, ne.Value);
                 return;
             }
 
