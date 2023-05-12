@@ -29,7 +29,7 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void TestAddition()
         {
             Assert.AreEqual(
                 expected: 2,
@@ -45,7 +45,7 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void TestMethod2()
+        public void TestMultiplication()
         {
             Assert.AreEqual(
                 expected: 6,
@@ -53,7 +53,7 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void TestMethod3()
+        public void TestDivision()
         {
             Assert.AreEqual(
                expected: 2.0 / 3.0,
@@ -61,7 +61,7 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void TestMethod4()
+        public void TestAssignment()
         {
             Assert.AreEqual(
               expected: 7,
