@@ -13,6 +13,8 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+coverage/
+
 # Mono auto generated files
 mono_crash.*
 
@@ -143,6 +145,7 @@ _TeamCity*
 !.axoCover/settings.json
 
 # Coverlet is a free, cross platform Code Coverage Tool
+coverage/
 coverage*.json
 coverage*.xml
 coverage*.info
