@@ -49,6 +49,15 @@ namespace Rillium.Script
                 }
             }
 
+            if (result is LiteralExpression literalExpression)
+            {
+                var m = literalExpression.Value.Value;
+                if (m is double lvd)
+                {
+                    return (T)Convert.ChangeType(lvd, typeof(T));
+                }
+            }
+
             if (result is double doubleResult)
             {
                 return (T)Convert.ChangeType(doubleResult, typeof(T));

@@ -41,6 +41,7 @@
 
             if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
             {
+                if (outputValue is Expression ex) { return ex.Evaluate(); }
                 return outputValue;
             }
 
@@ -126,7 +127,7 @@
                 var op = currentToken;
                 Eat(op.Type);
                 var rightFactor = ParseFactor();
-                leftFactor = new BinaryExpression(leftFactor, currentToken.Type, rightFactor);
+                leftFactor = new BinaryExpression(leftFactor, op.Type, rightFactor);
             }
             return leftFactor;
         }
@@ -336,13 +337,18 @@
                     return ParseIdentifierStatement();
                 case TokenType.Semicolon:
                     return new ExpressionStatement(new LiteralExpression(null));
+                case TokenType.LeftParen:
                 case TokenType.Number:
-                    var n = currentToken;
-                    Eat(TokenType.Number);
+                    return new ExpressionStatement(ParseArithmeticExpression());
+                //var n = currentToken;
+                //Eat(TokenType.Number);
 
-                    return new ExpressionStatement(
-                        new LiteralExpression(
-                            new LiteralValue() { TypeId = LiteralTypeId.Number, Value = n.Value }));
+                //var es = new ExpressionStatement(
+                //    new LiteralExpression(
+                //        new LiteralValue()
+                //        { TypeId = LiteralTypeId.Number, Value = n.Value }));
+
+                //if(currentToken == ppu)
 
                 case TokenType.Return:
                     return ParseReturnStatement();

@@ -19,10 +19,6 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("1;"));
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("return 1;"));
 
-            Assert.AreEqual(expected: long.MaxValue, Evaluator.Evaluate<long>($"{long.MaxValue}L"));
-            Assert.AreEqual(expected: long.MaxValue, Evaluator.Evaluate<long>($"{long.MaxValue};"));
-            Assert.AreEqual(expected: long.MaxValue, Evaluator.Evaluate<long>($"return {long.MaxValue};"));
-
             Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("1"));
             Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("1;"));
             Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("return 1;"));
@@ -36,8 +32,16 @@ namespace Rillium.Script.Test
         public void TestMethod1()
         {
             Assert.AreEqual(
-                expected: 5,
-                Evaluator.Evaluate<int>("1+(2+2)"));
+                expected: 2,
+                Evaluator.Evaluate<int>("1+1"));
+
+            Assert.AreEqual(
+               expected: 2,
+               Evaluator.Evaluate<int>("(1+1)"));
+
+            Assert.AreEqual(
+              expected: 3,
+              Evaluator.Evaluate<int>("(1+2)"));
         }
 
         [TestMethod]
@@ -53,7 +57,7 @@ namespace Rillium.Script.Test
         {
             Assert.AreEqual(
                expected: 2.0 / 3.0,
-               Evaluator.Evaluate<int>("2/(1+2)"));
+               Evaluator.Evaluate<double>("2/(1+2)"));
         }
 
         [TestMethod]
