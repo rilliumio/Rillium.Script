@@ -40,8 +40,6 @@ jobs:
           recreate: true
           path: code-coverage-results.md
 
-           - name: Upload coverage report
-      
       - name: Add coverage badge to README
         uses: actions/create-release@v1
         env:
