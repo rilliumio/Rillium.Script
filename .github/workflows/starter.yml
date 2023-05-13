@@ -47,6 +47,13 @@ jobs:
           README_PATH: README.md
           COVERAGE_PATH: coverage/badge.svg
           COVERAGE_PERCENTAGE: ${{ env.CODECOV_PERCENTAGE }}
+        with:
+          tag_name: v0.0.0
+          release_name: Release v0.0.0
+          body: |
+            Code coverage report for this release.
+          prerelease: true
+          draft: true
 
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
