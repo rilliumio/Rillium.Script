@@ -135,18 +135,34 @@
         // Parse a factor
         private Expression ParseFactor()
         {
+            var isNegative = false;
+            if (currentToken.Type == TokenType.Minus)
+            {
+                isNegative = true;
+                Eat(TokenType.Minus);
+            }
+
             if (currentToken.Type == TokenType.Number)
             {
                 var numberToken = currentToken;
                 Eat(TokenType.Number);
 
-                return new NumberExpression(double.Parse(numberToken.Value));
+                var d = double.Parse(numberToken.Value);
+                if (isNegative) { d = -d; }
+
+                return new NumberExpression(d);
             }
             else if (currentToken.Type == TokenType.LeftParen)
             {
+
                 Eat(TokenType.LeftParen);
                 var expr = ParseArithmeticExpression();
                 Eat(TokenType.RightParen);
+
+                if (isNegative)
+                {
+                    return new BinaryExpression(new NumberExpression(-1), TokenType.Star, expr);
+                }
                 return expr;
             }
             else
@@ -260,6 +276,7 @@
                 case TokenType.Identifier:
                     return ParseIdentifierExpression();
                 case TokenType.Number:
+                case TokenType.Minus:
                     return ParseLiteralExpression();
                 case TokenType.LeftParen:
                     return ParseGroupingExpression();
@@ -268,19 +285,33 @@
             }
         }
 
-        private LiteralExpression ParseLiteralExpression()
+        private Expression ParseLiteralExpression()
         {
+            var isNegative = false;
+            if (currentToken.Type == TokenType.Minus)
+            {
+                isNegative = true;
+                Eat(TokenType.Minus);
+            }
+
             var token = currentToken;
             switch (token.Type)
             {
                 case TokenType.Number:
                     Eat(TokenType.Number);
+
+                    var d = double.Parse(token.Value);
+                    if (isNegative) { d = -d; }
                     return new LiteralExpression(
                         new LiteralValue()
-                        {
-                            TypeId = LiteralTypeId.Number,
-                            Value = token.Value
-                        });
+                        { TypeId = LiteralTypeId.Number, Value = d });
+
+                case TokenType.LeftParen:
+                    var groupingExpressing = ParseGroupingExpression();
+                    return (isNegative)
+                        ? new BinaryExpression(new NumberExpression(-1), TokenType.Star, groupingExpressing)
+                        : groupingExpressing;
+
                 default:
                     throw new Exception($"Invalid literal expression: {currentToken.Type}");
             }
@@ -338,6 +369,7 @@
                 case TokenType.Semicolon:
                     return new ExpressionStatement(new LiteralExpression(null));
                 case TokenType.LeftParen:
+                case TokenType.Minus:
                 case TokenType.Number:
                     return new ExpressionStatement(ParseArithmeticExpression());
                 //var n = currentToken;
