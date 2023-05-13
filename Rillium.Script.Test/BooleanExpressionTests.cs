@@ -149,7 +149,6 @@
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return (-1<-2);"));
         }
 
-
         [TestMethod]
         public void LessEqualTest()
         {
@@ -169,7 +168,6 @@
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return 1<=0;"));
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return (1<=0);"));
         }
-
 
         [TestMethod]
         public void LessEqualNegativesTest()
