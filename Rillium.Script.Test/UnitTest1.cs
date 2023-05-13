@@ -26,6 +26,24 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 1f, Evaluator.Evaluate<float>("1"));
             Assert.AreEqual(expected: 1f, Evaluator.Evaluate<float>("1;"));
             Assert.AreEqual(expected: 1f, Evaluator.Evaluate<float>("return 1;"));
+
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-1"));
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-1;"));
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("return -1;"));
+        }
+
+        [TestMethod]
+        public void NegativeValue()
+        {
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("return -(2-1);"));
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-(2-1)"));
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-(2-1);"));
+
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("return -1;"));
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-1"));
+            Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-1;"));
+            Assert.AreEqual(expected: 0, Evaluator.Evaluate<int>("1-1"));
+            Assert.AreEqual(expected: 0, Evaluator.Evaluate<int>("-(1-1)"));
         }
 
         [TestMethod]
@@ -94,6 +112,12 @@ namespace Rillium.Script.Test
             Assert.AreEqual(
                 expected: 2,
                 Evaluator.Evaluate<int>(source));
+
+            const string source2 = "var x =0; if(1==10){ x=1; }else{ x=(2*(8+1));}; x;";
+
+            Assert.AreEqual(
+                expected: 18,
+                Evaluator.Evaluate<int>(source2));
         }
     }
 }
