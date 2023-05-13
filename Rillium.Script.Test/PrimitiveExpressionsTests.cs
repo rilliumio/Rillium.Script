@@ -19,6 +19,14 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("1;"));
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("return 1;"));
 
+            Assert.AreEqual(expected: 123, Evaluator.Evaluate<int>("123"));
+            Assert.AreEqual(expected: 123, Evaluator.Evaluate<int>("123;"));
+            Assert.AreEqual(expected: 123, Evaluator.Evaluate<int>("return 123;"));
+
+            Assert.AreEqual(expected: -123, Evaluator.Evaluate<int>("-123"));
+            Assert.AreEqual(expected: -123, Evaluator.Evaluate<int>("-123;"));
+            Assert.AreEqual(expected: -123, Evaluator.Evaluate<int>("return -123;"));
+
             Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("1"));
             Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("1;"));
             Assert.AreEqual(expected: 1d, Evaluator.Evaluate<double>("return 1;"));
