@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: Test
-        run: dotnet test -c Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
+        run: dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura  --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
 
       - name: Copy Coverage to Predictable Location
         run: cp coverage/*/coverage.cobertura.xml coverage/coverage.cobertura.xml
@@ -39,6 +39,16 @@ jobs:
         with:
           recreate: true
           path: code-coverage-results.md
+
+           - name: Upload coverage report
+      
+      - name: Add coverage badge to README
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          README_PATH: README.md
+          COVERAGE_PATH: coverage/badge.svg
+          COVERAGE_PERCENTAGE: ${{ env.CODECOV_PERCENTAGE }}
 
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
