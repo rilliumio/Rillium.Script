@@ -44,14 +44,6 @@ jobs:
           output: "both"
           thresholds: "60 80"
 
-      - name: Create code coverage badge
-        uses: actions/create-badge@v1
-        with:
-          path: code-coverage-badge.svg
-          label: Code Coverage
-          message: ${{ steps.code_coverage_summary.outputs.coverage }}%
-          color: success
-
       #  ---  Uncomment when public -----
       #- name: Add Coverage PR Comment
       #  uses: marocchino/sticky-pull-request-comment@v2
@@ -59,15 +51,6 @@ jobs:
       #  with:
       #    recreate: true
       #    path: code-coverage-results.md
-
-      - name: Add badge to README
-        uses: lowlighter/metrics@latest
-        with:
-          config: |
-            markdown: |
-              ### Code Coverage
-
-              ![Code Coverage](code-coverage-badge.svg)
 
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
