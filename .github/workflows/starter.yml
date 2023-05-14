@@ -1,6 +1,9 @@
 name: dotnet package
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request: [main]
 
 jobs:
   build:
@@ -15,23 +18,30 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+
       - name: Install dependencies
         run: dotnet restore
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
-      - name: Test
-        run: dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura  --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
 
-      - name: Copy Coverage to Predictable Location
-        run: cp coverage/*/coverage.cobertura.xml coverage/coverage.cobertura.xml
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+        #run: dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura  --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
 
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: coverage/coverage.cobertura.xml
+          filename: coverage/**/coverage.cobertura.xml
           badge: true
-          format: "markdown"
-          output: "both"
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: "60 80"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
@@ -45,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           README_PATH: README.md
-          COVERAGE_PATH: coverage/badge.svg
+          COVERAGE_PATH: coverage/**/badge.svg
           COVERAGE_PERCENTAGE: ${{ env.CODECOV_PERCENTAGE }}
         with:
           tag_name: v0.0.0
