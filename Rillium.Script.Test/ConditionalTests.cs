@@ -1,7 +1,7 @@
 ﻿namespace Rillium.Script.Test
 {
     [TestClass]
-    public class BooleanExpressionTests
+    public class ConditionalTestsExpressionTests
     {
         [TestMethod]
         public void EqualityTest()
