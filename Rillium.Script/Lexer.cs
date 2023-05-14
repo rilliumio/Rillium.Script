@@ -84,6 +84,31 @@
                     return new Token(TokenType.Equal, "=");
                 }
 
+                if (currentChar == '>')
+                {
+                    ConsumeChar();
+                    if (_input[_position] == '=')
+                    {
+                        ConsumeChar();
+                        return new Token(TokenType.GreaterEqual, ">=");
+                    }
+
+                    return new Token(TokenType.Greater, ">");
+                }
+
+                if (currentChar == '<')
+                {
+                    ConsumeChar();
+                    if (_input[_position] == '=')
+                    {
+                        ConsumeChar();
+                        return new Token(TokenType.LessEqual, "<=");
+                    }
+
+                    return new Token(TokenType.Less, "<");
+                }
+
+
                 // Numbers
                 if (char.IsDigit(currentChar))
                 {

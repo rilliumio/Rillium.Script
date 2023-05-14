@@ -62,7 +62,11 @@
 
             while (currentToken.Type == TokenType.Plus
                 || currentToken.Type == TokenType.Minus
-                || currentToken.Type == TokenType.EqualEqual)
+                || currentToken.Type == TokenType.EqualEqual
+                || currentToken.Type == TokenType.Less
+                || currentToken.Type == TokenType.LessEqual
+                || currentToken.Type == TokenType.Greater
+                || currentToken.Type == TokenType.GreaterEqual)
             {
                 var op = currentToken;
                 Eat(op.Type);
@@ -256,7 +260,12 @@
             while (currentToken.Type == TokenType.Plus ||
                    currentToken.Type == TokenType.Minus ||
                    currentToken.Type == TokenType.Star ||
-                   currentToken.Type == TokenType.Slash)
+                   currentToken.Type == TokenType.Slash ||
+                   currentToken.Type == TokenType.EqualEqual ||
+                   currentToken.Type == TokenType.Less ||
+                   currentToken.Type == TokenType.LessEqual ||
+                   currentToken.Type == TokenType.Greater ||
+                   currentToken.Type == TokenType.GreaterEqual)
             {
                 var op = currentToken;
                 Eat(op.Type);
@@ -372,16 +381,6 @@
                 case TokenType.Minus:
                 case TokenType.Number:
                     return new ExpressionStatement(ParseArithmeticExpression());
-                //var n = currentToken;
-                //Eat(TokenType.Number);
-
-                //var es = new ExpressionStatement(
-                //    new LiteralExpression(
-                //        new LiteralValue()
-                //        { TypeId = LiteralTypeId.Number, Value = n.Value }));
-
-                //if(currentToken == ppu)
-
                 case TokenType.Return:
                     return ParseReturnStatement();
                 case TokenType.Eof:

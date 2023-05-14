@@ -82,7 +82,10 @@
                 case TokenType.Star: return l * r;
                 case TokenType.Slash: return l / r;
                 case TokenType.EqualEqual: return (l == r) ? 1 : 0;
-                // Handle other operators
+                case TokenType.Less: return (l < r) ? 1 : 0;
+                case TokenType.LessEqual: return (l <= r) ? 1 : 0;
+                case TokenType.Greater: return (l > r) ? 1 : 0;
+                case TokenType.GreaterEqual: return (l >= r) ? 1 : 0;
                 default:
                     throw new Exception($"Unsupported operator: {Operator}");
             }
