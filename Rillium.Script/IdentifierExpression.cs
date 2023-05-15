@@ -9,8 +9,17 @@
             Name = name;
         }
 
-        public override LiteralExpression Evaluate() =>
-            throw new NotImplementedException();
+        public override Expression Evaluate(Scope scope)
+        {
+            if (scope.TryGet(Name, out object o) && o != null)
+            {
+                if (o is NumberExpression numberExpression) { return numberExpression; }
+
+                throw new ArgumentException($"could not evaluate '{Name}'.");
+            };
+
+            return this;
+        }
 
         public override T Accept<T>(IExpressionVisitor<T> visitor)
         {

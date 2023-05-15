@@ -34,11 +34,13 @@ namespace Rillium.Script
         /// <param name="source">The source script.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static T Evaluate<T>(string source) where T : IConvertible
+        public static T? Evaluate<T>(string source) where T : IConvertible
         {
             var (result, console) = Run(source);
             if (result is T) { return (T)result; }
             var typeT = typeof(T);
+
+            if (result == null && default(T) == null) { return default; }
 
             if (result is NumberExpression numberExpression)
             {
@@ -90,7 +92,9 @@ namespace Rillium.Script
                 }
             }
 
-            throw new NotImplementedException($"Could not convert output type '{result.GetType().Name}' to type '{typeT.Name}'");
+            return (result == null)
+                ? throw new ArgumentException($"Could not convert null output to type '{typeT.Name}'")
+                : throw new ArgumentException($"Could not convert output type '{result.GetType().Name}' to type '{typeT.Name}'");
         }
     }
 }

@@ -9,11 +9,12 @@
             Value = value;
         }
 
-        public override Expression Evaluate()
+        public override Expression Evaluate(Scope scope)
         {
             switch (Value.TypeId)
             {
                 case LiteralTypeId.String:
+                case LiteralTypeId.Unknown:
                     return this;
                 case LiteralTypeId.Number:
                     if (Value.Value is double d)

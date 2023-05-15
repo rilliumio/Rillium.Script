@@ -16,7 +16,7 @@
         public override void Execute(Scope scope)
         {
             // Evaluate the initializer expression, if present
-            var value = Initializer != null ? Initializer.EvaluateToLiteral() : null;
+            var value = Initializer != null ? Initializer.Evaluate(scope) : null;
 
             // Add the variable to the current scope
             scope.Set(Identifier.Value, value);

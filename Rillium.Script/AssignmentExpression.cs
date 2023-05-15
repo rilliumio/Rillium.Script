@@ -11,12 +11,12 @@
             Value = value;
         }
 
-        public override Expression Evaluate() => this;
+        public override Expression Evaluate(Scope scope) => this;
 
 
         public void Set(Scope scope)
         {
-            scope.Set(Target.Name.Value, Value.Evaluate());
+            scope.Set(Target.Name.Value, Value.Evaluate(scope));
         }
 
         public override T Accept<T>(IExpressionVisitor<T> visitor)

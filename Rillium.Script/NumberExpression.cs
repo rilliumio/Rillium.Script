@@ -9,7 +9,7 @@
             Value = value;
         }
 
-        public override Expression Evaluate() => this;
+        public override Expression Evaluate(Scope scope) => this;
 
         public override T Accept<T>(IExpressionVisitor<T> visitor)
         {

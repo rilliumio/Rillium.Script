@@ -11,7 +11,7 @@
 
         public override void Execute(Scope scope)
         {
-            var e = Expression.Evaluate();
+            var e = Expression.Evaluate(scope);
 
             if (e is AssignmentExpression ae)
             {

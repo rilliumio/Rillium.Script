@@ -27,7 +27,7 @@
                 var statement = ParseStatement(scope);
                 if (statement is ReturnStatement returnStatement)
                 {
-                    return returnStatement.EvaluateReturnExpression();
+                    return returnStatement.EvaluateReturnExpression(scope);
                 }
 
                 statement.Execute(scope);
@@ -41,7 +41,7 @@
 
             if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
             {
-                if (outputValue is Expression ex) { return ex.Evaluate(); }
+                if (outputValue is Expression ex) { return ex.Evaluate(scope); }
                 return outputValue;
             }
 
@@ -180,6 +180,17 @@
             Eat(TokenType.Var);
             var indentifier = currentToken;
             Eat(TokenType.Identifier);
+
+            if (currentToken.Type == TokenType.Semicolon)
+            {
+                Eat(TokenType.Semicolon);
+                return new DeclarationStatement(
+                    indentifier,
+                    new LiteralExpression(
+                        new LiteralValue()
+                        { Value = null, TypeId = LiteralTypeId.Unknown }));
+            }
+
             Eat(TokenType.Equal);
 
             // Parse expression
@@ -311,9 +322,7 @@
 
                     var d = double.Parse(token.Value);
                     if (isNegative) { d = -d; }
-                    return new LiteralExpression(
-                        new LiteralValue()
-                        { TypeId = LiteralTypeId.Number, Value = d });
+                    return new NumberExpression(d);
 
                 case TokenType.LeftParen:
                     var groupingExpressing = ParseGroupingExpression();

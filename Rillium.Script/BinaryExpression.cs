@@ -18,10 +18,10 @@
             return visitor.VisitBinaryExpression(this);
         }
 
-        public override Expression Evaluate()
+        public override Expression Evaluate(Scope scope)
         {
-            var left = Left.Evaluate();
-            var right = Right.Evaluate();
+            var left = Left.Evaluate(scope);
+            var right = Right.Evaluate(scope);
 
             if (left is LiteralExpression le && right is LiteralExpression ler)
             {

@@ -25,7 +25,7 @@
             Initialization.Execute(scope);
 
             // Loop while the condition is true
-            while (Condition.EvaluateToBool())
+            while (Condition.EvaluateToBool(scope))
             {
                 // Execute the loop body
                 Body.Execute(scope);
