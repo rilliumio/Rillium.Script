@@ -300,6 +300,8 @@
                     return ParseLiteralExpression();
                 case TokenType.LeftParen:
                     return ParseGroupingExpression();
+                case TokenType.LeftSquareBracket:
+                    return ParseArrayExpression();
                 default:
                     throw new Exception($"Unexpected token type: {token.Type}");
             }
@@ -335,12 +337,63 @@
             }
         }
 
+        private Expression ParseLiteralArrayExpression()
+        {
+            var isNegative = false;
+            if (currentToken.Type == TokenType.Minus)
+            {
+                isNegative = true;
+                Eat(TokenType.Minus);
+            }
+
+            var token = currentToken;
+            switch (token.Type)
+            {
+                case TokenType.Number:
+                    Eat(TokenType.Number);
+
+                    var d = double.Parse(token.Value);
+                    if (isNegative) { d = -d; }
+                    return new NumberExpression(d);
+
+                case TokenType.LeftParen:
+                    var groupingExpressing = ParseGroupingExpression();
+                    return (isNegative)
+                        ? new BinaryExpression(new NumberExpression(-1), TokenType.Star, groupingExpressing)
+                        : groupingExpressing;
+
+                default:
+                    throw new Exception($"Invalid literal expression: {currentToken.Type}");
+            }
+        }
+
         private Expression ParseGroupingExpression()
         {
             Eat(TokenType.LeftParen);
             var expr = ParseExpression();
             Eat(TokenType.RightParen);
             return expr;
+        }
+
+        private Expression ParseArrayExpression()
+        {
+            Eat(TokenType.LeftSquareBracket);
+            var expressionList = new List<Expression>();
+            while (true)
+            {
+                var expr = ParseLiteralArrayExpression();
+                expressionList.Add(expr);
+
+                if (currentToken.Type != TokenType.Comma || currentToken.Type == TokenType.RightSquareBracket)
+                {
+                    break;
+                }
+
+                Eat(TokenType.Comma);
+            }
+
+            Eat(TokenType.RightSquareBracket);
+            return new ArrayExpression(expressionList);
         }
 
 

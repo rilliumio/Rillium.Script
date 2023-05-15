@@ -66,6 +66,24 @@
                     return new Token(TokenType.RightBrace, "}");
                 }
 
+                if (currentChar == '[')
+                {
+                    ConsumeChar();
+                    return new Token(TokenType.LeftSquareBracket, "[");
+                }
+
+                if (currentChar == ']')
+                {
+                    ConsumeChar();
+                    return new Token(TokenType.RightSquareBracket, "[");
+                }
+
+                if (currentChar == ',')
+                {
+                    ConsumeChar();
+                    return new Token(TokenType.Comma, ",");
+                }
+
                 if (currentChar == ';')
                 {
                     ConsumeChar();
@@ -143,8 +161,20 @@
         private string ConsumeNumber()
         {
             var start = _position;
-            while (_position < _input.Length && char.IsDigit(_input[_position]))
+            var hasPeriod = false;
+
+            while (_position < _input.Length && (char.IsDigit(_input[_position]) || _input[_position] == '.'))
             {
+                if (_input[_position] == '.')
+                {
+                    if (hasPeriod)
+                    {
+                        throw new ArgumentException("Invalid number.");
+                    }
+
+                    hasPeriod = true;
+                }
+
                 _position++;
             }
 

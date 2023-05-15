@@ -4,7 +4,7 @@
     {
 
         // Single-character tokens
-        LeftParen, RightParen, LeftBrace, RightBrace,
+        LeftParen, RightParen, LeftBrace, RightBrace, LeftSquareBracket, RightSquareBracket,
         Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
 
         // One or two character tokens

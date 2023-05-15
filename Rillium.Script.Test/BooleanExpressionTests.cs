@@ -1,4 +1,5 @@
-﻿namespace Rillium.Script.Test
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace Rillium.Script.Test
 {
     [TestClass]
     public class BooleanExpressionTests

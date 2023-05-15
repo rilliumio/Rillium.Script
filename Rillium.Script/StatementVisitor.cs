@@ -39,6 +39,12 @@
             return default(T);
         }
 
+        public T VisitArrayDoubleStatement(ArrayExpression statement)
+        {
+            // Default behavior for ForLoopStatement
+            return default(T);
+        }
+
         public T VisitIfStatement(IfStatement statement)
         {
             statement.Condition.Accept(this); // Visit the condition expression
@@ -87,6 +93,11 @@
         }
 
         public T VisitVariableExpression(VariableExpression variableExpression)
+        {
+            return default(T);
+        }
+
+        public T VisitArrayDoubleExpression(ArrayExpression arrayDoubleExpression)
         {
             return default(T);
         }
