@@ -14,6 +14,8 @@ namespace Rillium.Script
 
         T VisitVariableExpression(VariableExpression expression);
 
-        T VisitArrayDoubleExpression(ArrayExpression expression);
+        T VisitArrayExpression(ArrayExpression expression);
+
+        T VisitIndexExpression(IndexExpression expression);
     }
 }

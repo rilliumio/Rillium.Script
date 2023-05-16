@@ -13,7 +13,7 @@
 
         public override T Accept<T>(IExpressionVisitor<T> visitor)
         {
-            return visitor.VisitArrayDoubleExpression(this);
+            return visitor.VisitArrayExpression(this);
         }
     }
 }

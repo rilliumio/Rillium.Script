@@ -97,7 +97,12 @@
             return default(T);
         }
 
-        public T VisitArrayDoubleExpression(ArrayExpression arrayDoubleExpression)
+        public T VisitArrayExpression(ArrayExpression arrayExpression)
+        {
+            return default(T);
+        }
+
+        public T VisitIndexExpression(IndexExpression expression)
         {
             return default(T);
         }

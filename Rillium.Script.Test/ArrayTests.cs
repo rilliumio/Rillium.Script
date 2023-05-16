@@ -52,5 +52,12 @@ namespace Rillium.Script.Test
                 expected: new double[] { 2, 4, 5 },
                 Evaluator.Evaluate<double[]>("var x = [2,4,5]; x;"));
         }
+
+        [TestMethod]
+        public void ArrayValueByIndexCorrectly()
+        {
+            Assert.AreEqual(expected: 2, Evaluator.Evaluate<int>("var x = [2]; x[0];"));
+            Assert.AreEqual(expected: 4, Evaluator.Evaluate<int>("var x = [2,4,8]; x[1];"));
+        }
     }
 }

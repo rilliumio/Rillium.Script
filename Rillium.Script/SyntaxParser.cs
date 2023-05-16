@@ -236,6 +236,18 @@
                 return new ExpressionStatement(new VariableExpression(identifier));
             }
 
+            if (currentToken.Type == TokenType.LeftSquareBracket)
+            {
+                Eat(TokenType.LeftSquareBracket);
+                var indexValueExpression = ParseExpression();
+                Eat(TokenType.RightSquareBracket);
+                if (currentToken.Type == TokenType.Semicolon)
+                {
+                    Eat(TokenType.Semicolon);
+                    return new ExpressionStatement(new IndexExpression(new VariableExpression(identifier), indexValueExpression));
+                }
+            }
+
             Eat(TokenType.Equal);
             var expression = ParseExpression();
             var assignmentExpression = new AssignmentExpression(new VariableExpression(identifier), expression);
