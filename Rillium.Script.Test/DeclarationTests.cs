@@ -82,5 +82,20 @@ namespace Rillium.Script.Test
         [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
         public void UndeclaredVariableTests() =>
             Evaluator.Evaluate<int>("var a = 1; a = b +1; a;");
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
+        public void UndeclaredVariableTests2() =>
+           Evaluator.Evaluate<int>("b + 1;");
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
+        public void UndeclaredVariableTests3() =>
+         Evaluator.Evaluate<int>("1 + b;");
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
+        public void UndeclaredVariableTests4() =>
+          Evaluator.Evaluate<int>("return b + 1;");
     }
 }

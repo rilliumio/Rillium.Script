@@ -35,7 +35,8 @@
 
             if (left is IdentifierExpression ie)
             {
-                throw new ArgumentException($"The name '{ie.Name}' does not exist in the current context.");
+                throw new ArgumentException(
+                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
             }
 
             throw new ArgumentException("Invalid binary expression.");
