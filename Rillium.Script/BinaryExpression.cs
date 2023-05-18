@@ -13,15 +13,10 @@
             Right = right;
         }
 
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        public override Expression Evaluate(Scope scope)
         {
-            return visitor.VisitBinaryExpression(this);
-        }
-
-        public override Expression Evaluate()
-        {
-            var left = Left.Evaluate();
-            var right = Right.Evaluate();
+            var left = Left.Evaluate(scope);
+            var right = Right.Evaluate(scope);
 
             if (left is LiteralExpression le && right is LiteralExpression ler)
             {
@@ -31,6 +26,12 @@
             if (left is NumberExpression len && right is NumberExpression lern)
             {
                 return Eval(len, lern);
+            }
+
+            if (left is IdentifierExpression ie)
+            {
+                throw new ArgumentException(
+                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
             }
 
             throw new ArgumentException("Invalid binary expression.");

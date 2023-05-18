@@ -4,5 +4,6 @@
     {
         String,
         Number,
+        Unknown,
     }
 }

@@ -15,7 +15,7 @@
 
         public override void Execute(Scope scope)
         {
-            if (Condition.EvaluateToBool())
+            if (Condition.EvaluateToBool(scope))
             {
                 ThenStatement.Execute(scope);
             }
@@ -23,11 +23,6 @@
             {
                 ElseStatement.Execute(scope);
             }
-        }
-
-        public override T Accept<T>(IStatementVisitor<T> visitor)
-        {
-            return visitor.VisitIfStatement(this);
         }
     }
 }

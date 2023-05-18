@@ -2,9 +2,6 @@
 {
     public abstract class Expression
     {
-        public abstract Expression Evaluate();
-
-        public abstract T Accept<T>(IExpressionVisitor<T> visitor);
-
+        public abstract Expression Evaluate(Scope scope);
     }
 }

@@ -9,11 +9,6 @@
             Statements = statements;
         }
 
-        public override T Accept<T>(IStatementVisitor<T> visitor)
-        {
-            return visitor.VisitBlockStatement(this);
-        }
-
         public override void Execute(Scope scope)
         {
             foreach (var statement in Statements)

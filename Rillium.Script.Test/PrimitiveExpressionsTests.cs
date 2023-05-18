@@ -1,3 +1,5 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace Rillium.Script.Test
 {
     [TestClass]
@@ -38,6 +40,12 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-1"));
             Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("-1;"));
             Assert.AreEqual(expected: -1, Evaluator.Evaluate<int>("return -1;"));
+        }
+
+        [TestMethod]
+        public void Decimal()
+        {
+            Assert.AreEqual(expected: 1.1, Evaluator.Evaluate<double>("1.1"));
         }
 
         [TestMethod]

@@ -21,7 +21,7 @@ namespace Rillium.Script
         public static object Run(string script, StreamWriter output)
         {
             var lexer = new Lexer(script);
-            var parser = new SyntaxParser(lexer, output);
+            var parser = new Parser(lexer, output);
 
             return parser.Parse();
         }
@@ -34,11 +34,15 @@ namespace Rillium.Script
         /// <param name="source">The source script.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static T Evaluate<T>(string source) where T : IConvertible
+        public static T? Evaluate<T>(string source)
         {
             var (result, console) = Run(source);
             if (result is T) { return (T)result; }
             var typeT = typeof(T);
+
+            if (result == null && default(T) == null) { return default; }
+            if (result != null && result.GetType() == typeT) { return (T)(object)result; }
+
 
             if (result is NumberExpression numberExpression)
             {
@@ -90,7 +94,55 @@ namespace Rillium.Script
                 }
             }
 
-            throw new NotImplementedException($"Could not convert output type '{result.GetType().Name}' to type '{typeT.Name}'");
+            if (result is List<double>)
+            {
+                return (T)Convert.ChangeType(result, typeof(double));
+            }
+
+
+            if (result is List<object> olist)
+            {
+                if (typeT == typeof(byte[]))
+                {
+                    return (T)(object)(olist.Select(x =>
+                          x is double d ? (byte)d
+                        : x is short s ? (byte)s
+                        : x is int i ? (byte)i
+                        : x is byte b ? b
+                        : throw new ArgumentException(x.GetType().Name)).ToArray());
+                }
+
+                if (typeT == typeof(short[]))
+                {
+                    return (T)(object)(olist.Select(x =>
+                          x is double d ? (short)d
+                        : x is short s ? s
+                        : x is int i ? (short)i
+                        : x is byte b ? (short)b
+                        : throw new ArgumentException(x.GetType().Name)).ToArray());
+                }
+
+                if (typeT == typeof(int[]))
+                {
+                    return (T)(object)(olist.Select(x =>
+                          x is int i ? i
+                        : x is double d ? (int)d
+                        : throw new ArgumentException(x.GetType().Name)).ToArray());
+                }
+
+                if (typeT == typeof(double[]))
+                {
+                    return (T)(object)(olist.Select(x =>
+                          x is double d ? d
+                        : x is int i ? (double)i
+                        : throw new ArgumentException(x.GetType().Name)).ToArray());
+                }
+            }
+
+
+            return (result == null)
+                ? throw new ArgumentException($"Could not convert null output to type '{typeT.Name}'")
+                : throw new ArgumentException($"Could not convert output type '{result.GetType().Name}' to type '{typeT.Name}'");
         }
     }
 }

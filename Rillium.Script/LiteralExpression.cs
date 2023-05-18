@@ -9,11 +9,12 @@
             Value = value;
         }
 
-        public override Expression Evaluate()
+        public override Expression Evaluate(Scope scope)
         {
             switch (Value.TypeId)
             {
                 case LiteralTypeId.String:
+                case LiteralTypeId.Unknown:
                     return this;
                 case LiteralTypeId.Number:
                     if (Value.Value is double d)
@@ -41,11 +42,6 @@
             if (v is double d) { return d == 1; }
 
             throw new ArgumentException($"Could not evaluate bool from '{Value.Value}'.");
-        }
-
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitLiteralExpression(this);
         }
     }
 }

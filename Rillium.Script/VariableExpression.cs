@@ -9,12 +9,9 @@
             Name = name;
         }
 
-        public override VariableExpression Evaluate() => this;
+        public override Expression Evaluate(Scope scope) =>
+             (Expression)scope.Get(Name.Value);
 
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitVariableExpression(this);
-        }
     }
 
 }
