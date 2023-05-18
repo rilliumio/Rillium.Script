@@ -1,19 +1,18 @@
 ﻿namespace Rillium.Script
 {
-    public class SyntaxParser
+    public class Parser
     {
         private readonly Lexer lexer;
-        private Token currentToken;
         private readonly StreamWriter ouput;
 
-        public SyntaxParser(Lexer lexer, StreamWriter ouput)
+        private Token currentToken;
+
+        public Parser(Lexer lexer, StreamWriter ouput)
         {
             this.lexer = lexer;
             this.ouput = ouput;
             currentToken = lexer.NextToken();
         }
-
-        public delegate void StatementHandler(Statement statement);
 
         public object Parse()
         {
@@ -524,19 +523,6 @@
             {
                 throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting {expectedType}");
             }
-        }
-    }
-
-    public interface StatementHandler
-    {
-        void HandleStatement(Statement statement);
-    }
-
-    public class PrintStatementHandler : StatementHandler
-    {
-        public void HandleStatement(Statement statement)
-        {
-            Console.WriteLine(statement);
         }
     }
 }

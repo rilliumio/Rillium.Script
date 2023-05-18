@@ -21,7 +21,7 @@ namespace Rillium.Script
         public static object Run(string script, StreamWriter output)
         {
             var lexer = new Lexer(script);
-            var parser = new SyntaxParser(lexer, output);
+            var parser = new Parser(lexer, output);
 
             return parser.Parse();
         }
