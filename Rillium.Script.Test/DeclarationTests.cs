@@ -68,5 +68,19 @@ namespace Rillium.Script.Test
 
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>(source));
         }
+
+
+        [TestMethod]
+        public void TestVariableIncrementsTest3()
+        {
+            const string source = @"var a = 1; var b = 2; a + b;";
+
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>(source));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
+        public void UndeclaredVariableTests() =>
+            Evaluator.Evaluate<int>("var a = 1; a = b +1; a;");
     }
 }

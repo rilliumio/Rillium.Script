@@ -255,16 +255,20 @@
         private Expression ParseExpression()
         {
             var expr = ParsePrimaryExpression();
+            return ParseToRight(expr);
+        }
 
+        private Expression ParseToRight(Expression? expr)
+        {
             while (currentToken.Type == TokenType.Plus ||
-                   currentToken.Type == TokenType.Minus ||
-                   currentToken.Type == TokenType.Star ||
-                   currentToken.Type == TokenType.Slash ||
-                   currentToken.Type == TokenType.EqualEqual ||
-                   currentToken.Type == TokenType.Less ||
-                   currentToken.Type == TokenType.LessEqual ||
-                   currentToken.Type == TokenType.Greater ||
-                   currentToken.Type == TokenType.GreaterEqual)
+                               currentToken.Type == TokenType.Minus ||
+                               currentToken.Type == TokenType.Star ||
+                               currentToken.Type == TokenType.Slash ||
+                               currentToken.Type == TokenType.EqualEqual ||
+                               currentToken.Type == TokenType.Less ||
+                               currentToken.Type == TokenType.LessEqual ||
+                               currentToken.Type == TokenType.Greater ||
+                               currentToken.Type == TokenType.GreaterEqual)
             {
                 var op = currentToken;
                 Eat(op.Type);
@@ -458,13 +462,17 @@
                 Eat(TokenType.LeftSquareBracket);
                 var indexValueExpression = ParseExpression();
                 Eat(TokenType.RightSquareBracket);
+
+                var idxExpr = new IndexExpression(
+                            new VariableExpression(token),
+                            indexValueExpression);
                 if (currentToken.Type == TokenType.Semicolon)
                 {
                     Eat(TokenType.Semicolon);
-                    return new IndexExpression(
-                            new VariableExpression(token),
-                            indexValueExpression);
+                    return idxExpr;
                 }
+
+                return ParseToRight(idxExpr);
             }
 
             if (currentToken.Type == TokenType.Dot)
@@ -486,8 +494,6 @@
 
                 if (currentToken.Type == TokenType.Semicolon)
                 {
-                    Eat(TokenType.Semicolon);
-
                     return arrayAggragate;
                 }
 
@@ -504,7 +510,7 @@
                 return new AssignmentExpression(new VariableExpression(token), expression);
             }
 
-            return new IdentifierExpression(token.Value);
+            return ParseToRight(new IdentifierExpression(token.Value));
         }
 
         // Helper method to advance to the next token

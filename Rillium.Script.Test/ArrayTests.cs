@@ -90,5 +90,36 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 9, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Max();"));
             Assert.AreEqual(expected: 6, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Average();"));
         }
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests3()
+        {
+            var source = @"var x = [2,4,8];
+                           1 + x.Length + x.Sum() + x.Min() + x.Max() + x.Average();";
+
+            Assert.AreEqual(expected: 33, Evaluator.Evaluate<int>(source));
+        }
+
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests4()
+        {
+            var source = @"var x = [2,4,8];
+                           var y = x.Length;
+                           return y;";
+
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>(source));
+        }
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests5()
+        {
+            var source = @"var x = [2,4,8];
+                           var i = 2;
+                           var y = i < x.Length;
+                           return y;";
+
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>(source));
+        }
     }
 }
