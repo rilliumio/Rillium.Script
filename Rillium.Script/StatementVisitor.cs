@@ -10,6 +10,8 @@
         T VisitDeclarationStatement(DeclarationStatement statement);
         T VisitVariableExpression(VariableExpression variableExpression);
 
+        T VisitArraySummaryExpression(ArraySummaryExpression variableExpression);
+
         // Add additional methods for each concrete subclass of Statement
     }
 
@@ -103,6 +105,11 @@
         }
 
         public T VisitIndexExpression(IndexExpression expression)
+        {
+            return default(T);
+        }
+
+        public T VisitArraySummaryExpression(ArraySummaryExpression variableExpression)
         {
             return default(T);
         }

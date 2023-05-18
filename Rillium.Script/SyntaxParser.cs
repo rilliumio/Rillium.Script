@@ -156,6 +156,13 @@
 
                 return new NumberExpression(d);
             }
+            if (currentToken.Type == TokenType.Identifier)
+            {
+                var identifierExpression = ParseIdentifierExpression();
+
+                return (isNegative) ? new BinaryExpression(new NumberExpression(-1), TokenType.Star, identifierExpression)
+                    : identifierExpression;
+            }
             else if (currentToken.Type == TokenType.LeftParen)
             {
 
@@ -227,31 +234,7 @@
         // Parse a for loop statement
         private ExpressionStatement ParseIdentifierStatement()
         {
-            var identifier = currentToken;
-            Eat(TokenType.Identifier);
-
-            if (currentToken.Type == TokenType.Semicolon)
-            {
-                Eat(TokenType.Semicolon);
-                return new ExpressionStatement(new VariableExpression(identifier));
-            }
-
-            if (currentToken.Type == TokenType.LeftSquareBracket)
-            {
-                Eat(TokenType.LeftSquareBracket);
-                var indexValueExpression = ParseExpression();
-                Eat(TokenType.RightSquareBracket);
-                if (currentToken.Type == TokenType.Semicolon)
-                {
-                    Eat(TokenType.Semicolon);
-                    return new ExpressionStatement(new IndexExpression(new VariableExpression(identifier), indexValueExpression));
-                }
-            }
-
-            Eat(TokenType.Equal);
-            var expression = ParseExpression();
-            var assignmentExpression = new AssignmentExpression(new VariableExpression(identifier), expression);
-            return new ExpressionStatement(assignmentExpression);
+            return new ExpressionStatement(ParseIdentifierExpression());
         }
 
         // Parse a for loop statement
@@ -267,13 +250,6 @@
             Eat(TokenType.RightParen);
             var body = ParseBlockStatement(scope);
             return new ForLoopStatement(init, condition, increment, body);
-        }
-
-        private Statement ParseExpressionStatement()
-        {
-            var expression = ParseExpression();
-            Eat(TokenType.Semicolon);
-            return new ExpressionStatement(expression);
         }
 
         private Expression ParseExpression()
@@ -464,10 +440,70 @@
             }
         }
 
-        private IdentifierExpression ParseIdentifierExpression()
+        private Expression ParseIdentifierExpression()
         {
             var token = currentToken;
             Eat(TokenType.Identifier);
+
+
+            if (currentToken.Type == TokenType.Semicolon)
+            {
+                Eat(TokenType.Semicolon);
+                return new VariableExpression(token);
+            }
+
+
+            if (currentToken.Type == TokenType.LeftSquareBracket)
+            {
+                Eat(TokenType.LeftSquareBracket);
+                var indexValueExpression = ParseExpression();
+                Eat(TokenType.RightSquareBracket);
+                if (currentToken.Type == TokenType.Semicolon)
+                {
+                    Eat(TokenType.Semicolon);
+                    return new IndexExpression(
+                            new VariableExpression(token),
+                            indexValueExpression);
+                }
+            }
+
+            if (currentToken.Type == TokenType.Dot)
+            {
+                Eat(TokenType.Dot);
+                var dotName = currentToken;
+                Eat(TokenType.Identifier);
+
+                var arraySummaryId = dotName.GetArraySummaryId();
+                if (arraySummaryId != ArraySummaryId.Length)
+                {
+                    Eat(TokenType.LeftParen);
+                    Eat(TokenType.RightParen);
+                }
+
+                var arrayAggragate = new ArraySummaryExpression(
+                           new VariableExpression(token),
+                           arraySummaryId);
+
+                if (currentToken.Type == TokenType.Semicolon)
+                {
+                    Eat(TokenType.Semicolon);
+
+                    return arrayAggragate;
+                }
+
+                var o = currentToken.Type;
+                Eat(o);
+                return new BinaryExpression(arrayAggragate, o, ParseExpression());
+            }
+
+            if (currentToken.Type == TokenType.Equal)
+            {
+
+                Eat(TokenType.Equal);
+                var expression = ParseExpression();
+                return new AssignmentExpression(new VariableExpression(token), expression);
+            }
+
             return new IdentifierExpression(token.Value);
         }
 

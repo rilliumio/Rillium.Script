@@ -58,6 +58,37 @@ namespace Rillium.Script.Test
         {
             Assert.AreEqual(expected: 2, Evaluator.Evaluate<int>("var x = [2]; x[0];"));
             Assert.AreEqual(expected: 4, Evaluator.Evaluate<int>("var x = [2,4,8]; x[1];"));
+            Assert.AreEqual(expected: 8, Evaluator.Evaluate<int>("var x = [2,4,8]; x[2];"));
+        }
+
+        [TestMethod]
+        public void ArrayAggregateTests()
+        {
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Length;"));
+            Assert.AreEqual(expected: 14, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Sum();"));
+            Assert.AreEqual(expected: 2, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Min();"));
+            Assert.AreEqual(expected: 8, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Max();"));
+            Assert.AreEqual(expected: 5, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Average();"));
+        }
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests1()
+        {
+            Assert.AreEqual(expected: 4, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Length + 1;"));
+            Assert.AreEqual(expected: 15, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Sum() + 1;"));
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Min() + 1;"));
+            Assert.AreEqual(expected: 9, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Max() + 1;"));
+            Assert.AreEqual(expected: 6, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Average() + 1;"));
+        }
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests2()
+        {
+            Assert.AreEqual(expected: 4, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Length;"));
+            Assert.AreEqual(expected: 15, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Sum();"));
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Min();"));
+            Assert.AreEqual(expected: 9, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Max();"));
+            Assert.AreEqual(expected: 6, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Average();"));
         }
     }
 }

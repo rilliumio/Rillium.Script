@@ -127,6 +127,13 @@
                 }
 
 
+                if (currentChar == '.')
+                {
+                    ConsumeChar();
+                    return new Token(TokenType.Dot, ".");
+                }
+
+
                 // Numbers
                 if (char.IsDigit(currentChar))
                 {

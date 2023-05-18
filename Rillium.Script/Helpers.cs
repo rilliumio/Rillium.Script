@@ -20,6 +20,11 @@
             }
         }
 
+        public static ArraySummaryId GetArraySummaryId(this Token token)
+        {
+            return (ArraySummaryId)Enum.Parse(typeof(ArraySummaryId), token.Value);
+        }
+
         private static bool IsTrue(LiteralValue literalValue) => IsTrue(literalValue.Value);
 
         private static bool IsTrue(object? value)

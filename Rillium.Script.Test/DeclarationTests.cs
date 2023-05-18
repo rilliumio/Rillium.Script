@@ -58,5 +58,15 @@ namespace Rillium.Script.Test
 
             Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>(source));
         }
+
+        [TestMethod]
+        public void TestVariableIncrementsTest2()
+        {
+            const string source = @"
+                var a = 0;
+                1 + a;";
+
+            Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>(source));
+        }
     }
 }
