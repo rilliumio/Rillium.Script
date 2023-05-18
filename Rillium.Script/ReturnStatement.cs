@@ -9,11 +9,6 @@
             this.value = value;
         }
 
-        public override T Accept<T>(IStatementVisitor<T> visitor)
-        {
-            throw new NotImplementedException();
-        }
-
         public object EvaluateReturnExpression(Scope scope) =>
             value.Evaluate(scope);
 

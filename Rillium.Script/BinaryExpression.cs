@@ -13,11 +13,6 @@
             Right = right;
         }
 
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitBinaryExpression(this);
-        }
-
         public override Expression Evaluate(Scope scope)
         {
             var left = Left.Evaluate(scope);

@@ -39,10 +39,6 @@
                 default: throw new NotImplementedException($"Invalid aggregate identifier '{arraySummaryId}'.");
             }
         }
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitArraySummaryExpression(this);
-        }
 
         private List<double> GetList(ArrayExpression ex, Scope scope)
         {

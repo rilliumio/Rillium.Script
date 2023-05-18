@@ -29,10 +29,5 @@
 
             return a.Value[(int)i.Value];
         }
-
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitIndexExpression(this);
-        }
     }
 }

@@ -18,10 +18,5 @@
         {
             scope.Set(Target.Name.Value, Value.Evaluate(scope));
         }
-
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitAssignmentExpression(this);
-        }
     }
 }

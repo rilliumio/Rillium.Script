@@ -21,10 +21,5 @@
             // Add the variable to the current scope
             scope.Set(Identifier.Value, value);
         }
-
-        public override T Accept<T>(IStatementVisitor<T> visitor)
-        {
-            return visitor.VisitDeclarationStatement(this);
-        }
     }
 }

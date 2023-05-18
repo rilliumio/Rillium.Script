@@ -52,11 +52,6 @@
             throw new NotImplementedException("Not handled");
         }
 
-        public override T Accept<T>(IStatementVisitor<T> visitor)
-        {
-            return visitor.VisitExpressionStatement(this);
-        }
-
         private static List<object> GetValues(ArrayExpression aa, Scope scope)
         {
             var values = new List<object>();

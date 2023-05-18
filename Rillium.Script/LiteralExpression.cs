@@ -43,10 +43,5 @@
 
             throw new ArgumentException($"Could not evaluate bool from '{Value.Value}'.");
         }
-
-        public override T Accept<T>(IExpressionVisitor<T> visitor)
-        {
-            return visitor.VisitLiteralExpression(this);
-        }
     }
 }
