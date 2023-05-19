@@ -1,4 +1,9 @@
-# Rillium.Script
+<div align="center">
+  <img src ="https://github.com/rilliumio/Rillium.Script/assets/126918909/8fdf5f75-5a53-43df-a996-85ad52e361bc" alt="Rillium.Script" height="200" style="vertical-align: middle;">
+  <br>
+  <span align="center"><h1>Rillium.Script</h1></span>
+  <span>Seamlessly add secure, high-performance user-facing scripts to your application with Rillium.Script.</span>
+</div>
 
 ## Introduction
 
