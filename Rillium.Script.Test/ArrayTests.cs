@@ -64,9 +64,9 @@ namespace Rillium.Script.Test
         [TestMethod]
         public void ArrayAggregateTests()
         {
+            Assert.AreEqual(expected: 2, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Min();"));
             Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Length;"));
             Assert.AreEqual(expected: 14, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Sum();"));
-            Assert.AreEqual(expected: 2, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Min();"));
             Assert.AreEqual(expected: 8, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Max();"));
             Assert.AreEqual(expected: 5, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Average();"));
         }

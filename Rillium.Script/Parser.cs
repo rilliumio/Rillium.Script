@@ -4,19 +4,21 @@
     {
         private readonly Lexer lexer;
         private readonly StreamWriter ouput;
+        private readonly FunctionTable functions;
 
         private Token currentToken;
 
-        public Parser(Lexer lexer, StreamWriter ouput)
+        public Parser(Lexer lexer, StreamWriter ouput, FunctionTable functions)
         {
             this.lexer = lexer;
             this.ouput = ouput;
+            this.functions = functions;
             currentToken = lexer.NextToken();
         }
 
         public object Parse()
         {
-            var scope = new Scope();
+            var scope = new Scope(functions);
 
             while (true)
             {
@@ -254,6 +256,8 @@
         private Expression ParseExpression()
         {
             var expr = ParsePrimaryExpression();
+            if (currentToken.Type == TokenType.Comma) { return expr; }
+
             return ParseToRight(expr);
         }
 
@@ -293,6 +297,8 @@
                     return ParseGroupingExpression();
                 case TokenType.LeftSquareBracket:
                     return ParseArrayExpression();
+                case TokenType.Function:
+                    return ParseFunctionExpression();
                 default:
                     throw new Exception($"Unexpected token type: {token.Type}");
             }
@@ -428,6 +434,8 @@
                     return ParseForLoopStatement(scope);
                 case TokenType.Identifier:
                     return ParseIdentifierStatement();
+                case TokenType.Function:
+                    return new ExpressionStatement(ParseFunctionExpression());
                 case TokenType.Semicolon:
                     return new ExpressionStatement(new LiteralExpression(null));
                 case TokenType.LeftParen:
@@ -441,6 +449,25 @@
                 default:
                     throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting a statement");
             }
+        }
+
+        private Expression ParseFunctionExpression()
+        {
+            var functionToken = currentToken;
+            Eat(TokenType.Function);
+            Eat(TokenType.LeftParen);
+
+            var arguments = new List<Expression>();
+            while (currentToken.Type != TokenType.RightParen)
+            {
+                if (currentToken.Type == TokenType.Comma) { Eat(TokenType.Comma); }
+
+                arguments.Add(ParseExpression());
+            }
+
+            Eat(TokenType.RightParen);
+
+            return new FunctionExpression(functionToken.Value, arguments);
         }
 
         private Expression ParseIdentifierExpression()
@@ -478,7 +505,8 @@
             {
                 Eat(TokenType.Dot);
                 var dotName = currentToken;
-                Eat(TokenType.Identifier);
+
+                EatOne(TokenType.Identifier, TokenType.Function);
 
                 var arraySummaryId = dotName.GetArraySummaryId();
                 if (arraySummaryId != ArraySummaryId.Length)
@@ -523,6 +551,27 @@
             {
                 throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting {expectedType}");
             }
+        }
+
+        /// <summary>
+        ///     Eats one of the expected tokens.
+        /// </summary>
+        /// <param name="expectedType"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        private void EatOne(params TokenType[] expectedTypes)
+        {
+            foreach (var expectedType in expectedTypes)
+            {
+                if (currentToken.Type == expectedType)
+                {
+                    currentToken = lexer.NextToken();
+                    return;
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Invalid token '{currentToken.Value}' found when " +
+                $"expecting one of the following: {string.Join(',', $"'{expectedTypes}'")}");
         }
     }
 }

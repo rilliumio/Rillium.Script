@@ -20,6 +20,35 @@
             }
         }
 
+        public static double EvaluateToDouble(this Expression ex, Scope scope)
+        {
+            var e = ex;
+            while (true)
+            {
+                if (e is NumberExpression ne)
+                {
+                    return ne.Value;
+                }
+
+                if (e is LiteralExpression le)
+                {
+                    return (double)le.Value.Value;
+                }
+
+                e = ex.Evaluate(scope);
+            }
+        }
+
+        public static object EvaluateToType(this Expression ex, LiteralTypeId literalTypeId, Scope scope)
+        {
+            switch (literalTypeId)
+            {
+                case LiteralTypeId.Number: return EvaluateToDouble(ex, scope);
+                default: throw new NotImplementedException($"Expression conversion to {nameof(literalTypeId)} '{literalTypeId}' not implemented.");
+            }
+        }
+
+
         public static ArraySummaryId GetArraySummaryId(this Token token)
         {
             return (ArraySummaryId)Enum.Parse(typeof(ArraySummaryId), token.Value);

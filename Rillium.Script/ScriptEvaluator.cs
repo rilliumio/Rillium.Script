@@ -20,8 +20,9 @@ namespace Rillium.Script
 
         public static object Run(string script, StreamWriter output)
         {
-            var lexer = new Lexer(script);
-            var parser = new Parser(lexer, output);
+            var functionTable = new FunctionTable();
+            var lexer = new Lexer(script, functionTable.GetFunctionNames());
+            var parser = new Parser(lexer, output, functionTable);
 
             return parser.Parse();
         }

@@ -2,7 +2,13 @@
 {
     public class Scope
     {
+        private readonly FunctionTable functions;
         private readonly IDictionary<string, object?> store = new Dictionary<string, object?>();
+
+        public Scope(FunctionTable functions)
+        {
+            this.functions = functions;
+        }
 
         public object? Get(string key) =>
             TryGet(key, out var value) ? value
@@ -14,5 +20,8 @@
 
         public void Set(string key, object value) =>
             store[key] = value;
+
+        public FunctionInfo GetFunction(string name, int arguementCout) =>
+            functions.GetFunction(name, arguementCout);
     }
 }

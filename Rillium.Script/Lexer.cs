@@ -4,11 +4,13 @@
     {
         private readonly string _input;
         private int _position;
+        private readonly ISet<string> functionNames;
 
-        public Lexer(string input)
+        public Lexer(string input, ISet<string> functionNames)
         {
             _input = input;
             _position = 0;
+            this.functionNames = functionNames;
         }
 
         public Token NextToken()
@@ -149,6 +151,11 @@
                     if (word == "for") { return new Token(TokenType.For, null); }
                     if (word == "var") { return new Token(TokenType.Var, null); }
                     if (word == "return") { return new Token(TokenType.Return, null); }
+
+                    if (functionNames.Contains(word))
+                    {
+                        return new Token(TokenType.Function, word);
+                    }
 
                     return new Token(TokenType.Identifier, word);
                 }
