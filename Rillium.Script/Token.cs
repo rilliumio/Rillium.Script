@@ -4,6 +4,7 @@
     {
         public TokenType Type { get; }
         public string Value { get; }
+        public int Arguments { get; }
         public int Line { get; }
 
         public Token(TokenType type, string value)
