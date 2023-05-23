@@ -1,10 +1,11 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class LiteralExpression : Expression
     {
         public LiteralValue Value { get; }
 
-        public LiteralExpression(LiteralValue value)
+        public LiteralExpression(Token token, LiteralValue value)
+            : base(token)
         {
             Value = value;
         }
@@ -19,12 +20,12 @@
                 case LiteralTypeId.Number:
                     if (Value.Value is double d)
                     {
-                        return new NumberExpression(d);
+                        return new NumberExpression(token, d);
                     }
 
                     if (Value.Value is string s)
                     {
-                        return new NumberExpression(double.Parse(s));
+                        return new NumberExpression(token, double.Parse(s));
                     }
                     throw new InvalidOperationException();
                 default:

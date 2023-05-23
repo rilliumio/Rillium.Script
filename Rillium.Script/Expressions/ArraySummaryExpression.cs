@@ -1,11 +1,12 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class ArraySummaryExpression : Expression
     {
         private Expression array;
         private ArraySummaryId arraySummaryId;
 
-        public ArraySummaryExpression(Expression array, ArraySummaryId arraySummaryId)
+        public ArraySummaryExpression(Token token, Expression array, ArraySummaryId arraySummaryId)
+            : base(token)
         {
             this.array = array;
             this.arraySummaryId = arraySummaryId;
@@ -22,19 +23,19 @@
             switch (arraySummaryId)
             {
                 case ArraySummaryId.Length:
-                    return new NumberExpression(ae.Value.Count);
+                    return new NumberExpression(token, ae.Value.Count);
 
                 case ArraySummaryId.Sum:
-                    return new NumberExpression(GetList(ae, scope).Sum());
+                    return new NumberExpression(token, GetList(ae, scope).Sum());
 
                 case ArraySummaryId.Max:
-                    return new NumberExpression(GetList(ae, scope).Max());
+                    return new NumberExpression(token, GetList(ae, scope).Max());
 
                 case ArraySummaryId.Min:
-                    return new NumberExpression(GetList(ae, scope).Min());
+                    return new NumberExpression(token, GetList(ae, scope).Min());
 
                 case ArraySummaryId.Average:
-                    return new NumberExpression(GetList(ae, scope).Average());
+                    return new NumberExpression(token, GetList(ae, scope).Average());
 
                 default: throw new NotImplementedException($"Invalid aggregate identifier '{arraySummaryId}'.");
             }

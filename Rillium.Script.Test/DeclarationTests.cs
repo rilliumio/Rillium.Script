@@ -1,9 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rillium.Script.Exceptions;
+
 namespace Rillium.Script.Test
 {
     [TestClass]
     public class DeclarationTests
     {
+        private const string Line1BadName = "Line 1. The name 'b' does not exist in the current context.";
+
         [TestMethod]
         public void Tests()
         {
@@ -78,24 +82,27 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>(source));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
         public void UndeclaredVariableTests() =>
-            Evaluator.Evaluate<int>("var a = 1; a = b +1; a;");
+            TestHelpers.ShouldThrowWithMessage<BadNameException>("var a = 1; a = b +1; a;", Line1BadName);
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
         public void UndeclaredVariableTests2() =>
-           Evaluator.Evaluate<int>("b + 1;");
+            TestHelpers.ShouldThrowWithMessage<BadNameException>("b + 1;", Line1BadName);
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
         public void UndeclaredVariableTests3() =>
-         Evaluator.Evaluate<int>("1 + b;");
+            TestHelpers.ShouldThrowWithMessage<BadNameException>("1 + b;", Line1BadName);
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException), "The name 'b' does not exist in the current context.")]
         public void UndeclaredVariableTests4() =>
-          Evaluator.Evaluate<int>("return b + 1;");
+            TestHelpers.ShouldThrowWithMessage<BadNameException>("return b + 1;", Line1BadName);
+
+        [TestMethod]
+        public void UndeclaredVariableTests5() =>
+            TestHelpers.ShouldThrowWithMessage<BadNameException>("b = 1;", Line1BadName);
+
+        [TestMethod]
+        public void UndeclaredVariableTests6() =>
+           TestHelpers.ShouldThrowWithMessage<BadNameException>("b n = 1;", Line1BadName);
     }
 }

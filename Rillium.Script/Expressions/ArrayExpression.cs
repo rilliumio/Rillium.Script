@@ -1,10 +1,11 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class ArrayExpression : Expression
     {
         public List<Expression> Value { get; }
 
-        public ArrayExpression(List<Expression> array)
+        public ArrayExpression(Token token, List<Expression> array)
+            : base(token)
         {
             Value = array;
         }

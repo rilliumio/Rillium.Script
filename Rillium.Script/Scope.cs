@@ -1,4 +1,6 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Exceptions;
+
+namespace Rillium.Script
 {
     public class Scope
     {
@@ -10,10 +12,17 @@
             this.functions = functions;
         }
 
-        public object? Get(string key) =>
-            TryGet(key, out var value) ? value
-            : throw new ArgumentException(
-                string.Format(Constants.ExceptionMessages.NameDoesNotExist, key));
+        public bool HasVariable(string name) => store.ContainsKey(name);
+
+        public object? Get(Token token)
+        {
+            if (TryGet(token.Value, out var value)) { return value; }
+
+            token.ThrowScriptException<BadNameException>(
+                string.Format(Constants.ExceptionMessages.NameDoesNotExist, token.Value));
+
+            return null;
+        }
 
         public bool TryGet(string key, out object? value) =>
             store.TryGetValue(key, out value);

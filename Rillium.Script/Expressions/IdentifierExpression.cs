@@ -1,22 +1,22 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class IdentifierExpression : Expression
     {
-        public string Name { get; }
+        public string Name => token.Value;
 
-        public IdentifierExpression(string name)
+        public IdentifierExpression(Token token)
+            : base(token)
         {
-            Name = name;
         }
 
         public override Expression Evaluate(Scope scope)
         {
-            if (scope.TryGet(Name, out var o) && o != null)
+            if (scope.TryGet(token.Value, out var o) && o != null)
             {
                 if (o is NumberExpression numberExpression) { return numberExpression; }
                 if (o is ArrayExpression arrayExpression) { return arrayExpression; };
                 ;
-                throw new ArgumentException($"could not evaluate '{Name}'.");
+                throw new ArgumentException($"could not evaluate '{token.Value}'. Line number: {token.Line}.");
             };
 
             return this;

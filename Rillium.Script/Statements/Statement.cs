@@ -1,4 +1,4 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Statements
 {
     public abstract class Statement
     {

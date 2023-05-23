@@ -9,7 +9,7 @@ namespace Rillium.Script.Test
         public void MathFunctionTest()
         {
             ShouldEvaluateEqual("Abs(-1)", Math.Abs(-1.0));
-            ShouldEvaluateEqual("Acos(45)", Math.Acos(45));
+            ShouldEvaluateEqual("Acos(0.002)", Math.Acos(0.002));
             ShouldEvaluateEqual("Acosh(45)", Math.Acosh(45));
             ShouldEvaluateEqual("Asin(45)", Math.Asin(45));
             ShouldEvaluateEqual("Asinh(45)", Math.Asinh(45));

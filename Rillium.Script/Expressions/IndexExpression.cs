@@ -1,11 +1,15 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class IndexExpression : Expression
     {
         private VariableExpression arrayVariable;
         private Expression indexExpression;
 
-        public IndexExpression(VariableExpression arrayVariableExpression, Expression indexExpression)
+        public IndexExpression(
+            Token token,
+            VariableExpression arrayVariableExpression,
+            Expression indexExpression)
+            : base(token)
         {
             arrayVariable = arrayVariableExpression;
             this.indexExpression = indexExpression;
@@ -18,7 +22,7 @@
                 throw new ArgumentException(
                     $"Cannot apply indexing with [] on " +
                     $"variable '{arrayVariable.Name.Value}' of type " +
-                    $"'{arrayVariable.Name.Type}'.");
+                    $"'{arrayVariable.Name.Id}'. Line number: {token.Line}.");
             }
 
             if (indexExpression.Evaluate(scope) is not NumberExpression i)

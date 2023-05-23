@@ -2,27 +2,27 @@
 {
     public class Token
     {
-        public TokenType Type { get; }
+        public TokenId Id { get; }
         public string Value { get; }
         public int Arguments { get; }
         public int Line { get; }
 
-        public Token(TokenType type, string value)
-        {
-            Type = type;
-            Value = value;
-        }
+        //public Token(TokenType type, string value)
+        //{
+        //    Type = type;
+        //    Value = value;
+        //}
 
-        public Token(TokenType type, string value, int line)
+        public Token(TokenId tokenId, string value, int line)
         {
-            Type = type;
+            Id = tokenId;
             Value = value;
             Line = line;
         }
 
         public override string ToString()
         {
-            return $"{Type}: {Value}";
+            return $"{Id}: {Value}";
         }
     }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rillium.Script
+namespace Rillium.Script.Statements
 {
     internal class IndexStatement
     {

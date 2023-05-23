@@ -1,11 +1,12 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class FunctionExpression : Expression
     {
         public string Name { get; }
         public IList<Expression> Arguments { get; }
 
-        public FunctionExpression(string name, IList<Expression> arguments)
+        public FunctionExpression(Token token, string name, IList<Expression> arguments)
+            : base(token)
         {
             Name = name;
             Arguments = arguments;
@@ -24,8 +25,8 @@
 
             if (f.Out == LiteralTypeId.Number)
             {
-                return new NumberExpression(f.Function?.Invoke(
-                       (f.ArgumentTokens.Count == 1) ?
+                return new NumberExpression(token, f.Function?.Invoke(
+                       f.ArgumentTokens.Count == 1 ?
                        functionArguments.First() :
                        functionArguments));
             }
