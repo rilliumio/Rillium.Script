@@ -1,4 +1,6 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Expressions;
+
+namespace Rillium.Script.Statements
 {
     public class ReturnStatement : Statement
     {

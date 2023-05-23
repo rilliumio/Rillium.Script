@@ -1,4 +1,6 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Expressions;
+
+namespace Rillium.Script
 {
     internal static class Helpers
     {

@@ -1,10 +1,11 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class NumberExpression : Expression
     {
         public double Value { get; }
 
-        public NumberExpression(double value)
+        public NumberExpression(Token token, double value)
+            : base(token)
         {
             Value = value;
         }

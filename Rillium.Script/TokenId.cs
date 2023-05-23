@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script
 {
-    public enum TokenType
+    public enum TokenId
     {
 
         // Single-character tokens

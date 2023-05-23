@@ -1,16 +1,15 @@
-﻿namespace Rillium.Script
+﻿namespace Rillium.Script.Expressions
 {
     public class VariableExpression : Expression
     {
-        public Token Name { get; }
+        public Token Name => token;
 
         public VariableExpression(Token name)
-        {
-            Name = name;
-        }
+            : base(name) { }
+
 
         public override Expression Evaluate(Scope scope) =>
-             (Expression)scope.Get(Name.Value);
+             (Expression)scope.Get(Name);
 
     }
 

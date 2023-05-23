@@ -4,6 +4,7 @@
     {
         private readonly string _input;
         private int _position;
+        private int _lineNumber;
         private readonly ISet<string> functionNames;
 
         public Lexer(string input, ISet<string> functionNames)
@@ -22,6 +23,7 @@
                 // Whitespace
                 if (char.IsWhiteSpace(currentChar))
                 {
+                    if (currentChar == '\n') { _lineNumber++; }
                     ConsumeChar();
                     continue;
                 }
@@ -30,66 +32,66 @@
                 if (currentChar == '+')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Plus, "+");
+                    return new Token(TokenId.Plus, "+", _lineNumber);
                 }
                 if (currentChar == '-')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Minus, "-");
+                    return new Token(TokenId.Minus, "-", _lineNumber);
                 }
                 if (currentChar == '*')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Star, "*");
+                    return new Token(TokenId.Star, "*", _lineNumber);
                 }
                 if (currentChar == '/')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Slash, "/");
+                    return new Token(TokenId.Slash, "/", _lineNumber);
                 }
                 if (currentChar == '(')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.LeftParen, "(");
+                    return new Token(TokenId.LeftParen, "(", _lineNumber);
                 }
                 if (currentChar == ')')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.RightParen, ")");
+                    return new Token(TokenId.RightParen, ")", _lineNumber);
                 }
                 if (currentChar == '{')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.LeftBrace, "{");
+                    return new Token(TokenId.LeftBrace, "{", _lineNumber);
                 }
                 if (currentChar == '}')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.RightBrace, "}");
+                    return new Token(TokenId.RightBrace, "}", _lineNumber);
                 }
 
                 if (currentChar == '[')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.LeftSquareBracket, "[");
+                    return new Token(TokenId.LeftSquareBracket, "[", _lineNumber);
                 }
 
                 if (currentChar == ']')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.RightSquareBracket, "[");
+                    return new Token(TokenId.RightSquareBracket, "[", _lineNumber);
                 }
 
                 if (currentChar == ',')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Comma, ",");
+                    return new Token(TokenId.Comma, ",", _lineNumber);
                 }
 
                 if (currentChar == ';')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Semicolon, ";");
+                    return new Token(TokenId.Semicolon, ";", _lineNumber);
                 }
 
                 if (currentChar == '=')
@@ -98,10 +100,10 @@
                     if (_input[_position] == '=')
                     {
                         ConsumeChar();
-                        return new Token(TokenType.EqualEqual, "==");
+                        return new Token(TokenId.EqualEqual, "==", _lineNumber);
                     }
 
-                    return new Token(TokenType.Equal, "=");
+                    return new Token(TokenId.Equal, "=", _lineNumber);
                 }
 
                 if (currentChar == '>')
@@ -110,10 +112,10 @@
                     if (_input[_position] == '=')
                     {
                         ConsumeChar();
-                        return new Token(TokenType.GreaterEqual, ">=");
+                        return new Token(TokenId.GreaterEqual, ">=", _lineNumber);
                     }
 
-                    return new Token(TokenType.Greater, ">");
+                    return new Token(TokenId.Greater, ">", _lineNumber);
                 }
 
                 if (currentChar == '<')
@@ -122,49 +124,49 @@
                     if (_input[_position] == '=')
                     {
                         ConsumeChar();
-                        return new Token(TokenType.LessEqual, "<=");
+                        return new Token(TokenId.LessEqual, "<=", _lineNumber);
                     }
 
-                    return new Token(TokenType.Less, "<");
+                    return new Token(TokenId.Less, "<", _lineNumber);
                 }
 
 
                 if (currentChar == '.')
                 {
                     ConsumeChar();
-                    return new Token(TokenType.Dot, ".");
+                    return new Token(TokenId.Dot, ".", _lineNumber);
                 }
 
 
                 // Numbers
                 if (char.IsDigit(currentChar))
                 {
-                    return new Token(TokenType.Number, ConsumeNumber());
+                    return new Token(TokenId.Number, ConsumeNumber(), _lineNumber);
                 }
 
                 // Identifiers
                 if (char.IsLetter(currentChar))
                 {
                     var word = ConsumeIdentifier();
-                    if (word == "if") { return new Token(TokenType.If, null); }
-                    if (word == "else") { return new Token(TokenType.Else, null); }
-                    if (word == "for") { return new Token(TokenType.For, null); }
-                    if (word == "var") { return new Token(TokenType.Var, null); }
-                    if (word == "return") { return new Token(TokenType.Return, null); }
+                    if (word == "if") { return new Token(TokenId.If, null, _lineNumber); }
+                    if (word == "else") { return new Token(TokenId.Else, null, _lineNumber); }
+                    if (word == "for") { return new Token(TokenId.For, null, _lineNumber); }
+                    if (word == "var") { return new Token(TokenId.Var, null, _lineNumber); }
+                    if (word == "return") { return new Token(TokenId.Return, null, _lineNumber); }
 
                     if (functionNames.Contains(word))
                     {
-                        return new Token(TokenType.Function, word);
+                        return new Token(TokenId.Function, word, _lineNumber);
                     }
 
-                    return new Token(TokenType.Identifier, word);
+                    return new Token(TokenId.Identifier, word, _lineNumber);
                 }
 
                 // Invalid character
                 throw new ArgumentException($"Invalid character '{currentChar}' at position {_position}");
             }
 
-            return new Token(TokenType.Eof, string.Empty);
+            return new Token(TokenId.Eof, string.Empty, _lineNumber);
         }
 
         private void ConsumeChar()

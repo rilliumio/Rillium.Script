@@ -1,4 +1,7 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Expressions;
+using Rillium.Script.Statements;
+
+namespace Rillium.Script
 {
     public class Parser
     {
@@ -23,7 +26,7 @@
             while (true)
             {
                 EatSemiColons();
-                if (currentToken.Type == TokenType.Eof) { break; }
+                if (currentToken.Id == TokenId.Eof) { break; }
 
                 var statement = ParseStatement(scope);
                 if (statement is ReturnStatement returnStatement)
@@ -33,7 +36,7 @@
 
                 statement.Execute(scope);
 
-                if (currentToken.Type == TokenType.Eof || statement == null) { break; }
+                if (currentToken.Id == TokenId.Eof || statement == null) { break; }
                 EatSemiColons();
 
             }
@@ -51,9 +54,9 @@
 
         private void EatSemiColons()
         {
-            while (currentToken.Type == TokenType.Semicolon)
+            while (currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenType.Semicolon);
+                Eat(TokenId.Semicolon);
             }
         }
 
@@ -61,18 +64,18 @@
         {
             var leftExpr = ParseTerm();
 
-            while (currentToken.Type == TokenType.Plus
-                || currentToken.Type == TokenType.Minus
-                || currentToken.Type == TokenType.EqualEqual
-                || currentToken.Type == TokenType.Less
-                || currentToken.Type == TokenType.LessEqual
-                || currentToken.Type == TokenType.Greater
-                || currentToken.Type == TokenType.GreaterEqual)
+            while (currentToken.Id == TokenId.Plus
+                || currentToken.Id == TokenId.Minus
+                || currentToken.Id == TokenId.EqualEqual
+                || currentToken.Id == TokenId.Less
+                || currentToken.Id == TokenId.LessEqual
+                || currentToken.Id == TokenId.Greater
+                || currentToken.Id == TokenId.GreaterEqual)
             {
                 var op = currentToken;
-                Eat(op.Type);
+                Eat(op.Id);
                 var rightExpr = ParseTerm();
-                leftExpr = new BinaryExpression(leftExpr, op.Type, rightExpr);
+                leftExpr = new BinaryExpression(leftExpr, op, rightExpr);
             }
             return leftExpr;
         }
@@ -82,39 +85,39 @@
         {
             while (true)
             {
-                var tokenPrecedence = GetPrecedence(currentToken.Type);
+                var tokenPrecedence = GetPrecedence(currentToken.Id);
 
                 if (tokenPrecedence < precedence)
                 {
                     return leftExpression;
                 }
 
-                Eat(currentToken.Type);
+                Eat(currentToken.Id);
 
                 var rightExpression = ParsePrimaryExpression();
 
                 var nextToken = currentToken;
-                var nextPrecedence = GetPrecedence(nextToken.Type);
+                var nextPrecedence = GetPrecedence(nextToken.Id);
 
                 if (nextPrecedence > tokenPrecedence)
                 {
                     rightExpression = ParseBinaryExpression(rightExpression, tokenPrecedence + 1);
                 }
 
-                leftExpression = new BinaryExpression(leftExpression, currentToken.Type, rightExpression);
+                leftExpression = new BinaryExpression(leftExpression, currentToken, rightExpression);
             }
         }
 
-        private int GetPrecedence(TokenType tokenType)
+        private int GetPrecedence(TokenId tokenType)
         {
             switch (tokenType)
             {
-                case TokenType.Plus:
-                case TokenType.Minus:
+                case TokenId.Plus:
+                case TokenId.Minus:
                     return 1;
 
-                case TokenType.Star:
-                case TokenType.Slash:
+                case TokenId.Star:
+                case TokenId.Slash:
                     return 2;
 
                 default:
@@ -127,12 +130,12 @@
         private Expression ParseTerm()
         {
             var leftFactor = ParseFactor();
-            while (currentToken.Type == TokenType.Star || currentToken.Type == TokenType.Slash)
+            while (currentToken.Id == TokenId.Star || currentToken.Id == TokenId.Slash)
             {
-                var op = currentToken;
-                Eat(op.Type);
+                var operatorToken = currentToken;
+                Eat(operatorToken.Id);
                 var rightFactor = ParseFactor();
-                leftFactor = new BinaryExpression(leftFactor, op.Type, rightFactor);
+                leftFactor = new BinaryExpression(leftFactor, operatorToken, rightFactor);
             }
             return leftFactor;
         }
@@ -141,65 +144,81 @@
         private Expression ParseFactor()
         {
             var isNegative = false;
-            if (currentToken.Type == TokenType.Minus)
+            if (currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
-                Eat(TokenType.Minus);
+                Eat(TokenId.Minus);
             }
 
-            if (currentToken.Type == TokenType.Number)
+            if (currentToken.Id == TokenId.Number)
             {
                 var numberToken = currentToken;
-                Eat(TokenType.Number);
+                Eat(TokenId.Number);
 
                 var d = double.Parse(numberToken.Value);
                 if (isNegative) { d = -d; }
 
-                return new NumberExpression(d);
+                return new NumberExpression(numberToken, d);
             }
-            if (currentToken.Type == TokenType.Identifier)
+            if (currentToken.Id == TokenId.Identifier)
             {
                 var identifierExpression = ParseIdentifierExpression();
 
-                return (isNegative) ? new BinaryExpression(new NumberExpression(-1), TokenType.Star, identifierExpression)
+                return (isNegative)
+                    ? new BinaryExpression(
+                        new NumberExpression(currentToken, -1),
+                        new Token(TokenId.Star, null, currentToken.Line),
+                        identifierExpression)
                     : identifierExpression;
             }
-            else if (currentToken.Type == TokenType.LeftParen)
+            else if (currentToken.Id == TokenId.LeftParen)
             {
 
-                Eat(TokenType.LeftParen);
+                Eat(TokenId.LeftParen);
                 var expr = ParseArithmeticExpression();
-                Eat(TokenType.RightParen);
+                Eat(TokenId.RightParen);
 
                 if (isNegative)
                 {
-                    return new BinaryExpression(new NumberExpression(-1), TokenType.Star, expr);
+                    return new BinaryExpression(
+                        new NumberExpression(currentToken, -1),
+                        new Token(TokenId.Star, null, currentToken.Line),
+                        expr);
                 }
                 return expr;
             }
             else
             {
-                throw new InvalidOperationException($"Invalid token {currentToken.Value} found when expecting an integer or a left parenthesis");
+                throw new InvalidOperationException(
+                    $"Invalid token {currentToken.Value} found " +
+                    $"when expecting an integer or a left parenthesis.");
             }
         }
 
         private DeclarationStatement ParseDeclarationStatement(Scope scope)
         {
-            Eat(TokenType.Var);
+            Eat(TokenId.Var);
             var indentifier = currentToken;
-            Eat(TokenType.Identifier);
 
-            if (currentToken.Type == TokenType.Semicolon)
+            scope.Set(indentifier.Value, null);
+
+            Eat(TokenId.Identifier);
+
+            if (currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenType.Semicolon);
+                Eat(TokenId.Semicolon);
                 return new DeclarationStatement(
                     indentifier,
                     new LiteralExpression(
+                        indentifier,
                         new LiteralValue()
-                        { Value = null, TypeId = LiteralTypeId.Unknown }));
+                        {
+                            Value = null,
+                            TypeId = LiteralTypeId.Unknown
+                        }));
             }
 
-            Eat(TokenType.Equal);
+            Eat(TokenId.Equal);
 
             // Parse expression
             var initializer = ParseExpression();
@@ -209,24 +228,24 @@
 
         private ReturnStatement ParseReturnStatement()
         {
-            Eat(TokenType.Return);
+            Eat(TokenId.Return);
             return new ReturnStatement(ParseExpression());
         }
 
         // Parse an if statement
         private IfStatement ParseIfStatement(Scope scope)
         {
-            Eat(TokenType.If);
-            Eat(TokenType.LeftParen);
+            Eat(TokenId.If);
+            Eat(TokenId.LeftParen);
             var condition = ParseArithmeticExpression();
-            Eat(TokenType.RightParen);
+            Eat(TokenId.RightParen);
 
 
             var thenStatement = ParseBlockStatement(scope);
             Statement elseStatement = null;
-            if (currentToken.Type == TokenType.Else)
+            if (currentToken.Id == TokenId.Else)
             {
-                Eat(TokenType.Else);
+                Eat(TokenId.Else);
                 elseStatement = ParseBlockStatement(scope);
             }
             return new IfStatement(condition, thenStatement, elseStatement);
@@ -241,14 +260,14 @@
         // Parse a for loop statement
         private ForLoopStatement ParseForLoopStatement(Scope scope)
         {
-            Eat(TokenType.For);
-            Eat(TokenType.LeftParen);
+            Eat(TokenId.For);
+            Eat(TokenId.LeftParen);
             var init = ParseStatement(scope);
-            Eat(TokenType.Semicolon);
+            Eat(TokenId.Semicolon);
             var condition = ParseExpression();
-            Eat(TokenType.Semicolon);
+            Eat(TokenId.Semicolon);
             var increment = ParseStatement(scope);
-            Eat(TokenType.RightParen);
+            Eat(TokenId.RightParen);
             var body = ParseBlockStatement(scope);
             return new ForLoopStatement(init, condition, increment, body);
         }
@@ -256,28 +275,28 @@
         private Expression ParseExpression()
         {
             var expr = ParsePrimaryExpression();
-            if (currentToken.Type == TokenType.Comma) { return expr; }
+            if (currentToken.Id == TokenId.Comma) { return expr; }
 
             return ParseToRight(expr);
         }
 
         private Expression ParseToRight(Expression? expr)
         {
-            while (currentToken.Type == TokenType.Plus ||
-                               currentToken.Type == TokenType.Minus ||
-                               currentToken.Type == TokenType.Star ||
-                               currentToken.Type == TokenType.Slash ||
-                               currentToken.Type == TokenType.EqualEqual ||
-                               currentToken.Type == TokenType.Less ||
-                               currentToken.Type == TokenType.LessEqual ||
-                               currentToken.Type == TokenType.Greater ||
-                               currentToken.Type == TokenType.GreaterEqual)
+            while (currentToken.Id == TokenId.Plus ||
+                   currentToken.Id == TokenId.Minus ||
+                   currentToken.Id == TokenId.Star ||
+                   currentToken.Id == TokenId.Slash ||
+                   currentToken.Id == TokenId.EqualEqual ||
+                   currentToken.Id == TokenId.Less ||
+                   currentToken.Id == TokenId.LessEqual ||
+                   currentToken.Id == TokenId.Greater ||
+                   currentToken.Id == TokenId.GreaterEqual)
             {
                 var op = currentToken;
-                Eat(op.Type);
+                Eat(op.Id);
 
                 var right = ParsePrimaryExpression();
-                expr = new BinaryExpression(expr, op.Type, right);
+                expr = new BinaryExpression(expr, op, right);
             }
 
             return expr;
@@ -286,111 +305,117 @@
         private Expression? ParsePrimaryExpression()
         {
             var token = currentToken;
-            switch (token.Type)
+            switch (token.Id)
             {
-                case TokenType.Identifier:
+                case TokenId.Identifier:
                     return ParseIdentifierExpression();
-                case TokenType.Number:
-                case TokenType.Minus:
+                case TokenId.Number:
+                case TokenId.Minus:
                     return ParseLiteralExpression();
-                case TokenType.LeftParen:
+                case TokenId.LeftParen:
                     return ParseGroupingExpression();
-                case TokenType.LeftSquareBracket:
+                case TokenId.LeftSquareBracket:
                     return ParseArrayExpression();
-                case TokenType.Function:
+                case TokenId.Function:
                     return ParseFunctionExpression();
                 default:
-                    throw new Exception($"Unexpected token type: {token.Type}");
+                    throw new Exception($"Unexpected token type: {token.Id}");
             }
         }
 
         private Expression ParseLiteralExpression()
         {
             var isNegative = false;
-            if (currentToken.Type == TokenType.Minus)
+            if (currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
-                Eat(TokenType.Minus);
+                Eat(TokenId.Minus);
             }
 
             var token = currentToken;
-            switch (token.Type)
+            switch (token.Id)
             {
-                case TokenType.Number:
-                    Eat(TokenType.Number);
+                case TokenId.Number:
+                    Eat(TokenId.Number);
 
                     var d = double.Parse(token.Value);
                     if (isNegative) { d = -d; }
-                    return new NumberExpression(d);
+                    return new NumberExpression(token, d);
 
-                case TokenType.LeftParen:
+                case TokenId.LeftParen:
                     var groupingExpressing = ParseGroupingExpression();
                     return (isNegative)
-                        ? new BinaryExpression(new NumberExpression(-1), TokenType.Star, groupingExpressing)
+                        ? new BinaryExpression(
+                            new NumberExpression(token, -1),
+                            new Token(TokenId.Star, null, currentToken.Line),
+                            groupingExpressing)
                         : groupingExpressing;
 
                 default:
-                    throw new Exception($"Invalid literal expression: {currentToken.Type}");
+                    throw new Exception($"Invalid literal expression: {currentToken.Id}");
             }
         }
 
         private Expression ParseLiteralArrayExpression()
         {
             var isNegative = false;
-            if (currentToken.Type == TokenType.Minus)
+            if (currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
-                Eat(TokenType.Minus);
+                Eat(TokenId.Minus);
             }
 
             var token = currentToken;
-            switch (token.Type)
+            switch (token.Id)
             {
-                case TokenType.Number:
-                    Eat(TokenType.Number);
+                case TokenId.Number:
+                    Eat(TokenId.Number);
 
                     var d = double.Parse(token.Value);
                     if (isNegative) { d = -d; }
-                    return new NumberExpression(d);
+                    return new NumberExpression(token, d);
 
-                case TokenType.LeftParen:
+                case TokenId.LeftParen:
                     var groupingExpressing = ParseGroupingExpression();
                     return (isNegative)
-                        ? new BinaryExpression(new NumberExpression(-1), TokenType.Star, groupingExpressing)
+                        ? new BinaryExpression(
+                            new NumberExpression(token, -1),
+                            new Token(TokenId.Star, null, currentToken.Line),
+                            groupingExpressing)
                         : groupingExpressing;
 
                 default:
-                    throw new Exception($"Invalid literal expression: {currentToken.Type}");
+                    throw new Exception($"Invalid literal expression: {currentToken.Id}");
             }
         }
 
         private Expression ParseGroupingExpression()
         {
-            Eat(TokenType.LeftParen);
+            Eat(TokenId.LeftParen);
             var expr = ParseExpression();
-            Eat(TokenType.RightParen);
+            Eat(TokenId.RightParen);
             return expr;
         }
 
         private Expression ParseArrayExpression()
         {
-            Eat(TokenType.LeftSquareBracket);
+            Eat(TokenId.LeftSquareBracket);
             var expressionList = new List<Expression>();
             while (true)
             {
                 var expr = ParseLiteralArrayExpression();
                 expressionList.Add(expr);
 
-                if (currentToken.Type != TokenType.Comma || currentToken.Type == TokenType.RightSquareBracket)
+                if (currentToken.Id != TokenId.Comma || currentToken.Id == TokenId.RightSquareBracket)
                 {
                     break;
                 }
 
-                Eat(TokenType.Comma);
+                Eat(TokenId.Comma);
             }
 
-            Eat(TokenType.RightSquareBracket);
-            return new ArrayExpression(expressionList);
+            Eat(TokenId.RightSquareBracket);
+            return new ArrayExpression(currentToken, expressionList);
         }
 
 
@@ -398,23 +423,23 @@
         {
             var statements = new List<Statement>();
 
-            Eat(TokenType.LeftBrace);
+            Eat(TokenId.LeftBrace);
 
             while (
-                currentToken.Type != TokenType.RightBrace &&
-                currentToken.Type != TokenType.Semicolon &&
-                currentToken.Type != TokenType.Eof)
+                currentToken.Id != TokenId.RightBrace &&
+                currentToken.Id != TokenId.Semicolon &&
+                currentToken.Id != TokenId.Eof)
             {
                 statements.Add(ParseStatement(scope));
 
             }
 
-            while (currentToken.Type == TokenType.Semicolon)
+            while (currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenType.Semicolon);
+                Eat(TokenId.Semicolon);
             }
 
-            Eat(TokenType.RightBrace);
+            Eat(TokenId.RightBrace);
 
             return new BlockStatement(statements);
         }
@@ -422,29 +447,29 @@
         // Parse a statement
         private Statement? ParseStatement(Scope scope)
         {
-            switch (currentToken.Type)
+            switch (currentToken.Id)
             {
-                case TokenType.Var:
+                case TokenId.Var:
                     return ParseDeclarationStatement(scope);
-                case TokenType.If:
+                case TokenId.If:
                     return ParseIfStatement(scope);
-                case TokenType.LeftBrace:
+                case TokenId.LeftBrace:
                     return ParseBlockStatement(scope);
-                case TokenType.For:
+                case TokenId.For:
                     return ParseForLoopStatement(scope);
-                case TokenType.Identifier:
+                case TokenId.Identifier:
                     return ParseIdentifierStatement();
-                case TokenType.Function:
+                case TokenId.Function:
                     return new ExpressionStatement(ParseFunctionExpression());
-                case TokenType.Semicolon:
-                    return new ExpressionStatement(new LiteralExpression(null));
-                case TokenType.LeftParen:
-                case TokenType.Minus:
-                case TokenType.Number:
+                case TokenId.Semicolon:
+                    return new ExpressionStatement(new LiteralExpression(currentToken, null));
+                case TokenId.LeftParen:
+                case TokenId.Minus:
+                case TokenId.Number:
                     return new ExpressionStatement(ParseArithmeticExpression());
-                case TokenType.Return:
+                case TokenId.Return:
                     return ParseReturnStatement();
-                case TokenType.Eof:
+                case TokenId.Eof:
                     return null;
                 default:
                     throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting a statement");
@@ -454,96 +479,101 @@
         private Expression ParseFunctionExpression()
         {
             var functionToken = currentToken;
-            Eat(TokenType.Function);
-            Eat(TokenType.LeftParen);
+            Eat(TokenId.Function);
+            Eat(TokenId.LeftParen);
 
             var arguments = new List<Expression>();
-            while (currentToken.Type != TokenType.RightParen)
+            while (currentToken.Id != TokenId.RightParen)
             {
-                if (currentToken.Type == TokenType.Comma) { Eat(TokenType.Comma); }
+                if (currentToken.Id == TokenId.Comma) { Eat(TokenId.Comma); }
 
                 arguments.Add(ParseExpression());
             }
 
-            Eat(TokenType.RightParen);
+            Eat(TokenId.RightParen);
 
-            return new FunctionExpression(functionToken.Value, arguments);
+            return new FunctionExpression(
+                functionToken,
+                functionToken.Value, arguments);
         }
 
         private Expression ParseIdentifierExpression()
         {
             var token = currentToken;
-            Eat(TokenType.Identifier);
+            Eat(TokenId.Identifier);
 
 
-            if (currentToken.Type == TokenType.Semicolon)
+            if (currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenType.Semicolon);
+                Eat(TokenId.Semicolon);
                 return new VariableExpression(token);
             }
 
 
-            if (currentToken.Type == TokenType.LeftSquareBracket)
+            if (currentToken.Id == TokenId.LeftSquareBracket)
             {
-                Eat(TokenType.LeftSquareBracket);
+                Eat(TokenId.LeftSquareBracket);
                 var indexValueExpression = ParseExpression();
-                Eat(TokenType.RightSquareBracket);
+                Eat(TokenId.RightSquareBracket);
 
                 var idxExpr = new IndexExpression(
+                            currentToken,
                             new VariableExpression(token),
                             indexValueExpression);
-                if (currentToken.Type == TokenType.Semicolon)
+
+                if (currentToken.Id == TokenId.Semicolon)
                 {
-                    Eat(TokenType.Semicolon);
+                    Eat(TokenId.Semicolon);
                     return idxExpr;
                 }
 
                 return ParseToRight(idxExpr);
             }
 
-            if (currentToken.Type == TokenType.Dot)
+            if (currentToken.Id == TokenId.Dot)
             {
-                Eat(TokenType.Dot);
+                Eat(TokenId.Dot);
                 var dotName = currentToken;
 
-                EatOne(TokenType.Identifier, TokenType.Function);
+                EatOne(TokenId.Identifier, TokenId.Function);
 
                 var arraySummaryId = dotName.GetArraySummaryId();
                 if (arraySummaryId != ArraySummaryId.Length)
                 {
-                    Eat(TokenType.LeftParen);
-                    Eat(TokenType.RightParen);
+                    Eat(TokenId.LeftParen);
+                    Eat(TokenId.RightParen);
                 }
 
                 var arrayAggragate = new ArraySummaryExpression(
+                           token,
                            new VariableExpression(token),
                            arraySummaryId);
 
-                if (currentToken.Type == TokenType.Semicolon)
+                if (currentToken.Id == TokenId.Semicolon)
                 {
                     return arrayAggragate;
                 }
 
-                var o = currentToken.Type;
-                Eat(o);
-                return new BinaryExpression(arrayAggragate, o, ParseExpression());
+                var operatorToken = currentToken;
+                Eat(operatorToken.Id);
+                return new BinaryExpression(arrayAggragate, operatorToken, ParseExpression());
             }
 
-            if (currentToken.Type == TokenType.Equal)
+            if (currentToken.Id == TokenId.Equal)
             {
 
-                Eat(TokenType.Equal);
+                Eat(TokenId.Equal);
                 var expression = ParseExpression();
-                return new AssignmentExpression(new VariableExpression(token), expression);
+                return new AssignmentExpression(token, new VariableExpression(token), expression);
             }
 
-            return ParseToRight(new IdentifierExpression(token.Value));
+            return ParseToRight(new IdentifierExpression(token));
         }
 
         // Helper method to advance to the next token
-        private void Eat(TokenType expectedType)
+        private void Eat(TokenId expectedType)
         {
-            if (currentToken.Type == expectedType)
+            if (currentToken.Id == expectedType)
             {
                 currentToken = lexer.NextToken();
             }
@@ -558,11 +588,11 @@
         /// </summary>
         /// <param name="expectedType"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        private void EatOne(params TokenType[] expectedTypes)
+        private void EatOne(params TokenId[] expectedTypes)
         {
             foreach (var expectedType in expectedTypes)
             {
-                if (currentToken.Type == expectedType)
+                if (currentToken.Id == expectedType)
                 {
                     currentToken = lexer.NextToken();
                     return;

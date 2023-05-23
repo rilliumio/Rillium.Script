@@ -1,4 +1,7 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Expressions;
+
+namespace Rillium.Script.Statements
 {
     public class ExpressionStatement : Statement
     {
@@ -19,8 +22,7 @@
                 return;
             }
 
-            // TODO: Should this be supported?
-            // example: var x = 1; x; where this handles the final x;
+            // The case when the script ends with a final variable.
             if (e is VariableExpression ve)
             {
                 var ev = ve.Evaluate(scope);
@@ -49,7 +51,14 @@
                 return;
             }
 
-            throw new NotImplementedException("Not handled");
+            if (e is IdentifierExpression ie)
+            {
+                ie.ThrowScriptException<BadNameException>(
+                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
+            }
+
+            e.ThrowScriptException<ScriptException>(
+                $"Expression type {e.GetType().Name} not handled.");
         }
 
         private static List<object> GetValues(ArrayExpression aa, Scope scope)
