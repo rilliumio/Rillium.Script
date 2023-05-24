@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Rillium.Script.Expressions;
+﻿using Rillium.Script.Expressions;
 
 namespace Rillium.Script
 {
@@ -67,33 +66,6 @@ namespace Rillium.Script
             if (result is double doubleResult)
             {
                 return (T)Convert.ChangeType(doubleResult, typeof(T));
-            }
-
-            if (result is string s)
-            {
-                if (typeT == typeof(double))
-                {
-                    var d = double.Parse(s, CultureInfo.InvariantCulture);
-                    return (T)(object)d;
-                }
-
-                if (typeT == typeof(int))
-                {
-                    var d = int.Parse(s, CultureInfo.InvariantCulture);
-                    return (T)(object)d;
-                }
-
-                if (typeT == typeof(float))
-                {
-                    var d = float.Parse(s, CultureInfo.InvariantCulture);
-                    return (T)(object)d;
-                }
-
-                if (typeT == typeof(long))
-                {
-                    var d = long.Parse(s, CultureInfo.InvariantCulture);
-                    return (T)(object)d;
-                }
             }
 
             if (result is List<double>)

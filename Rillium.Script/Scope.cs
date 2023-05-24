@@ -2,7 +2,7 @@
 
 namespace Rillium.Script
 {
-    public class Scope
+    internal class Scope
     {
         private readonly FunctionTable functions;
         private readonly IDictionary<string, object?> store = new Dictionary<string, object?>();

@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Expressions
 {
-    public abstract class Expression
+    internal abstract class Expression
     {
         protected readonly Token token;
 

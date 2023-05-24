@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script.Expressions
 {
-    public class FunctionExpression : Expression
+    internal class FunctionExpression : Expression
     {
         public string Name { get; }
         public IList<Expression> Arguments { get; }

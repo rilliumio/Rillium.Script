@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Statements
 {
-    public class ForLoopStatement : Statement
+    internal class ForLoopStatement : Statement
     {
         public Statement Initialization { get; }
         public Expression Condition { get; }

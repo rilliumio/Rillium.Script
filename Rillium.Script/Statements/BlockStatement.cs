@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script.Statements
 {
-    public class BlockStatement : Statement
+    internal class BlockStatement : Statement
     {
         public List<Statement> Statements { get; }
 

@@ -121,5 +121,16 @@ namespace Rillium.Script.Test
 
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>(source));
         }
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests6()
+        {
+            var expectedMessage = "Cannot apply indexing with [] on variable 'x' of type 'Identifier'. Line number: 1.";
+            var source = @"var x = 2;
+                           var i = x[1];
+                           return i;";
+
+            TestHelpers.ShouldThrowWithMessage<ScriptException>(source, expectedMessage);
+        }
     }
 }

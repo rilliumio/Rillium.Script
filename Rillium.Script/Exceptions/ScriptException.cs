@@ -1,9 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace Rillium.Script
 {
-
     [Serializable]
+    [ExcludeFromCodeCoverage]
     public class ScriptException : Exception, ISerializable
     {
         public ScriptException() : base()

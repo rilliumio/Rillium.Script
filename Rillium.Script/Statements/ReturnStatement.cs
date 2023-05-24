@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Statements
 {
-    public class ReturnStatement : Statement
+    internal class ReturnStatement : Statement
     {
         private Expression value;
 

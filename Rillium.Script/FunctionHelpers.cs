@@ -84,18 +84,5 @@
 
             return argumentTypes;
         }
-
-        private static FunctionInfo Build(
-            string name,
-            LiteralTypeId returnType,
-            Func<dynamic, dynamic> Function,
-            params LiteralTypeId[] argumentTokens) =>
-            new FunctionInfo()
-            {
-                Name = name,
-                Out = returnType,
-                Function = Function,
-                ArgumentTokens = argumentTokens,
-            };
     }
 }

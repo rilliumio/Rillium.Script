@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script.Expressions
 {
-    public class ArraySummaryExpression : Expression
+    internal class ArraySummaryExpression : Expression
     {
         private Expression array;
         private ArraySummaryId arraySummaryId;

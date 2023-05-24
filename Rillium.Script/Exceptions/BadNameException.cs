@@ -1,7 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace Rillium.Script.Exceptions
 {
+    [Serializable]
+    [ExcludeFromCodeCoverage]
     public class BadNameException : ScriptException
     {
         public BadNameException() : base()

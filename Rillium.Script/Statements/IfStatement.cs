@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Statements
 {
-    public class IfStatement : Statement
+    internal class IfStatement : Statement
     {
         public Expression Condition { get; }
         public Statement ThenStatement { get; }

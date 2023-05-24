@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script.Expressions
 {
-    public class VariableExpression : Expression
+    internal class VariableExpression : Expression
     {
         public Token Name => token;
 

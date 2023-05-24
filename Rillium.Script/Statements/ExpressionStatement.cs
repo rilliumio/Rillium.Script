@@ -3,7 +3,7 @@ using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
-    public class ExpressionStatement : Statement
+    internal class ExpressionStatement : Statement
     {
         public Expression Expression { get; }
 
@@ -20,23 +20,6 @@ namespace Rillium.Script.Statements
             {
                 ae.Set(scope);
                 return;
-            }
-
-            // The case when the script ends with a final variable.
-            if (e is VariableExpression ve)
-            {
-                var ev = ve.Evaluate(scope);
-                if (ev is NumberExpression ne1)
-                {
-                    scope.Set(Constants.OutputValueKey, ne1.Value);
-                    return;
-                }
-
-
-                if (ev is ArrayExpression aa0)
-                {
-                    scope.Set(Constants.OutputValueKey, GetValues(aa0, scope));
-                }
             }
 
             if (e is NumberExpression ne)
@@ -69,23 +52,13 @@ namespace Rillium.Script.Statements
             {
                 var r = v.Evaluate(scope);
 
-                if (r is VariableExpression ve)
-                {
-                    var ev = ve.Evaluate(scope);
-                    if (ev is NumberExpression ne1)
-                    {
-                        values.Add(ne1.Value);
-                        continue;
-                    }
-                }
-
                 if (r is NumberExpression ne0)
                 {
                     values.Add(ne0.Value);
                     continue;
                 }
 
-                throw new NotImplementedException("Could not evaluate array expression.");
+                throw new ScriptException("Could not evaluate array expression.");
             }
 
             return values;

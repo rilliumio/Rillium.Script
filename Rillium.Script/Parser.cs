@@ -3,7 +3,7 @@ using Rillium.Script.Statements;
 
 namespace Rillium.Script
 {
-    public class Parser
+    internal class Parser
     {
         private readonly Lexer lexer;
         private readonly StreamWriter ouput;

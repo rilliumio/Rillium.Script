@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Expressions
 {
-    public class AssignmentExpression : Expression
+    internal class AssignmentExpression : Expression
     {
         public VariableExpression Target { get; }
         public Expression Value { get; }
