@@ -38,41 +38,18 @@ namespace Rillium.Script
         public static T? Evaluate<T>(string source)
         {
             var (result, console) = Run(source);
-            if (result is T) { return (T)result; }
+            if (result is T t) { return t; }
             var typeT = typeof(T);
 
-            if (result == null && default(T) == null) { return default; }
-            if (result != null && result.GetType() == typeT) { return (T)(object)result; }
-
-
-            if (result is NumberExpression numberExpression)
+            if (result is NumberExpression numberExpression && numberExpression.Value is double nev)
             {
-                var m = numberExpression.Value;
-                if (m is double d)
-                {
-                    return (T)Convert.ChangeType(d, typeof(T));
-                }
-            }
-
-            if (result is LiteralExpression literalExpression)
-            {
-                var m = literalExpression.Value.Value;
-                if (m is double lvd)
-                {
-                    return (T)Convert.ChangeType(lvd, typeof(T));
-                }
+                return (T)Convert.ChangeType(nev, typeof(T));
             }
 
             if (result is double doubleResult)
             {
                 return (T)Convert.ChangeType(doubleResult, typeof(T));
             }
-
-            if (result is List<double>)
-            {
-                return (T)Convert.ChangeType(result, typeof(double));
-            }
-
 
             if (result is List<object> olist)
             {

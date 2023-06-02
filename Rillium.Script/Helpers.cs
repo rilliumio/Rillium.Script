@@ -13,6 +13,7 @@ namespace Rillium.Script
                 {
                     return IsTrue(ne.Value);
                 }
+
                 if (e is LiteralExpression le)
                 {
                     return IsTrue(le.Value);
