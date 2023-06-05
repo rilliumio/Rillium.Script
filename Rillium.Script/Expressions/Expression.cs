@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Rillium.Script.Expressions
+﻿namespace Rillium.Script.Expressions
 {
     internal abstract class Expression
     {
@@ -13,11 +11,5 @@ namespace Rillium.Script.Expressions
         }
 
         public abstract Expression Evaluate(Scope scope);
-
-        [DoesNotReturn]
-        public void ThrowScriptException<T>(string message) where T : ScriptException
-        {
-            this.Token.ThrowScriptException<T>(message);
-        }
     }
 }

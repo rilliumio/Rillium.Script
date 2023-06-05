@@ -65,6 +65,14 @@ namespace Rillium.Script
                     return ne.Value;
                 }
 
+                if (e is LiteralExpression literalExpression)
+                {
+                    if (literalExpression.Value.TypeId == LiteralTypeId.String)
+                    {
+                        throw new ScriptException($"Line {ex.Token.Line + 1}. Cannot convert type {literalExpression.Value.TypeId} to double.");
+                    }
+                }
+
                 e = ex.Evaluate(scope);
             }
         }

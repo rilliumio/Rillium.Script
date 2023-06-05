@@ -18,9 +18,12 @@ namespace Rillium.Script.Test
                 expectedExceptionMessage,
                 Assert.ThrowsException<T>(() => Evaluator.Evaluate<object>(source)).Message);
 
+        public static void ShouldThrowWithMessage<T>(this Expression expression, Scope scope, string expectedExceptionMessage) where T : Exception =>
+            Assert.AreEqual(
+                 expectedExceptionMessage,
+                 Assert.ThrowsException<T>(() => expression.Evaluate(scope)).Message);
+
         public static void ShouldThrowWithMessage<T>(this Expression expression, string expectedExceptionMessage) where T : Exception =>
-          Assert.AreEqual(
-              expectedExceptionMessage,
-              Assert.ThrowsException<T>(() => expression.Evaluate(null)).Message);
+            ShouldThrowWithMessage<T>(expression, scope: new Scope(new FunctionTable()), expectedExceptionMessage);
     }
 }

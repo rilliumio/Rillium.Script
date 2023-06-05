@@ -19,8 +19,10 @@ namespace Rillium.Script.Statements
             {
                 if (literalExpression.Value.TypeId == LiteralTypeId.UnAssigned)
                 {
-                    literalExpression.ThrowScriptException<ScriptException>(
-                        string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, expression.Token.Value));
+
+                    throw new ScriptException(
+                      $"Line {literalExpression.Token.Line + 1}. " +
+                      string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, expression.Token.Value));
                 }
             }
 

@@ -28,7 +28,7 @@
             if (this.indexExpression.Evaluate(scope) is not NumberExpression i)
             {
                 throw new ScriptException(
-                   $"Invalid indexing value. Expected a number.");
+                   $"Line {this.Token.Line + 1}. Invalid array index value.");
             }
 
             return a.Value[(int)i.Value];

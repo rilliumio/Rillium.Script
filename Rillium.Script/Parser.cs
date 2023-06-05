@@ -314,30 +314,6 @@ namespace Rillium.Script
             }
         }
 
-        private Expression ParseLiteralArrayExpression()
-        {
-            var isNegative = false;
-            if (this.currentToken.Id == TokenId.Minus)
-            {
-                isNegative = true;
-                this.Eat(TokenId.Minus);
-            }
-
-            var token = this.currentToken;
-            switch (token.Id)
-            {
-                case TokenId.Number:
-                    this.Eat(TokenId.Number);
-
-                    var d = double.Parse(token.Value);
-                    if (isNegative) { d = -d; }
-                    return new NumberExpression(token, d);
-
-                default:
-                    throw new Exception($"Invalid literal expression: {this.currentToken.Id}");
-            }
-        }
-
         private Expression ParseGroupingExpression()
         {
             this.Eat(TokenId.LeftParen);
@@ -352,7 +328,7 @@ namespace Rillium.Script
             var expressionList = new List<Expression>();
             while (true)
             {
-                var expr = this.ParseLiteralArrayExpression();
+                var expr = this.ParseLiteralExpression();
                 expressionList.Add(expr);
 
                 if (this.currentToken.Id != TokenId.Comma || this.currentToken.Id == TokenId.RightSquareBracket)

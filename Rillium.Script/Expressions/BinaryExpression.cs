@@ -45,8 +45,9 @@ namespace Rillium.Script.Expressions
                     le.ShouldNotBeUnassigned();
                 }
 
-                this.ThrowScriptException<BadNameException>(
-                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
+                throw new BadNameException(
+                    $"Line {this.Token.Line + 1}. " +
+                    $"{string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name)}");
             }
 
             if (left is LiteralExpression ll)
@@ -83,7 +84,7 @@ namespace Rillium.Script.Expressions
             TokenId.Greater => l > r ? 1 : 0,
             TokenId.GreaterEqual => l >= r ? 1 : 0,
             _ => throw new ScriptException(
-                                $"Line: {this.Token.Line}. Invalid binary operator '{this.Token.Id}'."),
+                                $"Line: {this.Token.Line + 1}. Invalid binary operator '{this.Token.Id}'."),
         };
     }
 }
