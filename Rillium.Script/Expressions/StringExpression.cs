@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rillium.Script.Statements
+namespace Rillium.Script.Expressions
 {
-    internal class IndexStatement
+    internal class StringExpression
     {
     }
 }

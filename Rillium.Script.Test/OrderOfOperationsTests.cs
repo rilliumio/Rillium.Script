@@ -8,20 +8,20 @@ namespace Rillium.Script.Test
         [TestMethod]
         public void OrderOfOperationsPositivesCorrectly()
         {
-            foreach (var source in OrderOfOpertationsDeps.PositiveCases.Keys)
+            foreach (var source in OrderOfOperationsDeps.PositiveCases.Keys)
             {
                 source.ShouldEvaluateEqual(
-                    OrderOfOpertationsDeps.PositiveCases[source]);
+                    OrderOfOperationsDeps.PositiveCases[source]);
             }
         }
 
         [TestMethod]
         public void OrderOfOperationsNegativesCorrectly()
         {
-            foreach (var source in OrderOfOpertationsDeps.NegativeCases.Keys)
+            foreach (var source in OrderOfOperationsDeps.NegativeCases.Keys)
             {
                 source.ShouldEvaluateEqual(
-                    OrderOfOpertationsDeps.NegativeCases[source]);
+                    OrderOfOperationsDeps.NegativeCases[source]);
             }
         }
     }

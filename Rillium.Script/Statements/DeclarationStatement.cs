@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Statements
 {
-    public class DeclarationStatement : Statement
+    internal class DeclarationStatement : Statement
     {
         public Token Identifier { get; }
         public Expression Initializer { get; }

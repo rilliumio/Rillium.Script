@@ -1,9 +1,9 @@
 ﻿namespace Rillium.Script.Expressions
 {
-    public class ArraySummaryExpression : Expression
+    internal class ArraySummaryExpression : Expression
     {
-        private Expression array;
-        private ArraySummaryId arraySummaryId;
+        private readonly Expression array;
+        private readonly ArraySummaryId arraySummaryId;
 
         public ArraySummaryExpression(Token token, Expression array, ArraySummaryId arraySummaryId)
             : base(token)
@@ -14,30 +14,31 @@
 
         public override Expression Evaluate(Scope scope)
         {
-            var e = array.Evaluate(scope);
+            var e = this.array.Evaluate(scope);
             if (e is not ArrayExpression ae)
             {
-                throw new ArgumentException("Expected array expression.");
+                throw new ScriptException(
+                    $"Line {this.Token.Line + 1}. Expected array.");
             }
 
-            switch (arraySummaryId)
+            switch (this.arraySummaryId)
             {
                 case ArraySummaryId.Length:
-                    return new NumberExpression(token, ae.Value.Count);
+                    return new NumberExpression(this.Token, ae.Value.Count);
 
                 case ArraySummaryId.Sum:
-                    return new NumberExpression(token, GetList(ae, scope).Sum());
+                    return new NumberExpression(this.Token, this.GetList(ae, scope).Sum());
 
                 case ArraySummaryId.Max:
-                    return new NumberExpression(token, GetList(ae, scope).Max());
+                    return new NumberExpression(this.Token, this.GetList(ae, scope).Max());
 
                 case ArraySummaryId.Min:
-                    return new NumberExpression(token, GetList(ae, scope).Min());
+                    return new NumberExpression(this.Token, this.GetList(ae, scope).Min());
 
                 case ArraySummaryId.Average:
-                    return new NumberExpression(token, GetList(ae, scope).Average());
+                    return new NumberExpression(this.Token, this.GetList(ae, scope).Average());
 
-                default: throw new NotImplementedException($"Invalid aggregate identifier '{arraySummaryId}'.");
+                default: throw new ScriptException($"Line {this.Token.Line + 1}. Invalid aggregate identifier '{this.arraySummaryId}'.");
             }
         }
 
@@ -49,7 +50,9 @@
                 var r = e.Evaluate(scope);
                 if (r is not NumberExpression ne)
                 {
-                    throw new ArgumentException("Could not perform aggregate on non numeric array.");
+                    throw new ScriptException(
+                        $"Line {this.Token.Line + 1}. Could not " +
+                        $"perform aggregate on non numeric array.");
                 }
 
                 m.Add(ne.Value);

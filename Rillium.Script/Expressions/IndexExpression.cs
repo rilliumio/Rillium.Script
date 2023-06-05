@@ -1,9 +1,9 @@
 ﻿namespace Rillium.Script.Expressions
 {
-    public class IndexExpression : Expression
+    internal class IndexExpression : Expression
     {
-        private VariableExpression arrayVariable;
-        private Expression indexExpression;
+        private readonly VariableExpression arrayVariable;
+        private readonly Expression indexExpression;
 
         public IndexExpression(
             Token token,
@@ -11,23 +11,23 @@
             Expression indexExpression)
             : base(token)
         {
-            arrayVariable = arrayVariableExpression;
+            this.arrayVariable = arrayVariableExpression;
             this.indexExpression = indexExpression;
         }
 
         public override Expression Evaluate(Scope scope)
         {
-            if (arrayVariable.Evaluate(scope) is not ArrayExpression a)
+            if (this.arrayVariable.Evaluate(scope) is not ArrayExpression a)
             {
-                throw new ArgumentException(
+                throw new ScriptException(
                     $"Cannot apply indexing with [] on " +
-                    $"variable '{arrayVariable.Name.Value}' of type " +
-                    $"'{arrayVariable.Name.Id}'. Line number: {token.Line}.");
+                    $"variable '{this.arrayVariable.Name.Value}' of type " +
+                    $"'{this.arrayVariable.Name.Id}'. Line number: {this.Token.Line}.");
             }
 
-            if (indexExpression.Evaluate(scope) is not NumberExpression i)
+            if (this.indexExpression.Evaluate(scope) is not NumberExpression i)
             {
-                throw new ArgumentException(
+                throw new ScriptException(
                    $"Invalid indexing value. Expected a number.");
             }
 

@@ -2,13 +2,14 @@
 
 namespace Rillium.Script.Expressions
 {
-    public abstract class Expression
+    internal abstract class Expression
     {
-        protected readonly Token token;
+        public readonly Token Token;
 
         public Expression(Token token)
         {
-            this.token = token;
+            token.ShouldNotBeNull();
+            this.Token = token;
         }
 
         public abstract Expression Evaluate(Scope scope);
@@ -16,7 +17,7 @@ namespace Rillium.Script.Expressions
         [DoesNotReturn]
         public void ThrowScriptException<T>(string message) where T : ScriptException
         {
-            token.ThrowScriptException<T>(message);
+            this.Token.ThrowScriptException<T>(message);
         }
     }
 }

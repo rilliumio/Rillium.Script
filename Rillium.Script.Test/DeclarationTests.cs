@@ -9,18 +9,30 @@ namespace Rillium.Script.Test
         private const string Line1BadName = "Line 1. The name 'b' does not exist in the current context.";
 
         [TestMethod]
+        public void UnassignedVariableTests()
+        {
+            const string message = "Line 1. Use of unassigned local variable 'x'.";
+            TestHelpers.ShouldThrowWithMessage<ScriptException>("var x; x;", message);
+            TestHelpers.ShouldThrowWithMessage<ScriptException>("var x; return x;", message);
+            TestHelpers.ShouldThrowWithMessage<ScriptException>("var x; var y = 1 + x; y;", message);
+            TestHelpers.ShouldThrowWithMessage<ScriptException>("var x; var y = x + 1; y;", message);
+        }
+
+        [TestMethod]
         public void Tests()
         {
+            Assert.AreEqual(expected: 100, Evaluator.Evaluate<int>("var x; x = 100; x;"));
+
             Assert.AreEqual(expected: 100, Evaluator.Evaluate<int>("var x = 100; x;"));
             Assert.AreEqual(expected: -100, Evaluator.Evaluate<int>("var x = -100; x;"));
 
-            Assert.AreEqual(expected: 100, Evaluator.Evaluate<int>("var x; x = 100; x;"));
             Assert.AreEqual(expected: -100, Evaluator.Evaluate<int>("var x; x = -100; x;"));
         }
 
         [TestMethod]
         public void TestsMultipleDeclarationTest()
         {
+
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("var x = 100; var y = 5; var z = y==x; z;"));
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("var x = 100; var y = 100; var z = y==x; z;"));
 

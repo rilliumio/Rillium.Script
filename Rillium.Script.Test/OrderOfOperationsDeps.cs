@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script.Test
 {
-    internal static class OrderOfOpertationsDeps
+    internal static class OrderOfOperationsDeps
     {
         public static readonly Dictionary<string, int> PositiveCases = new()
         {

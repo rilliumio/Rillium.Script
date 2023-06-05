@@ -7,6 +7,14 @@ namespace Rillium.Script.Test
         [TestMethod]
         public void EqualityTest()
         {
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("return true;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("true"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("true;"));
+
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("false"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("false;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return false;"));
+
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("1"));
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("1;"));
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("return 1;"));
@@ -25,7 +33,7 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void EqualityCompairingNegativeNumbersTest()
+        public void EqualityComparingNegativeNumbersTest()
         {
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("0"));
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("-1"));

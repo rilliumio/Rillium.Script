@@ -3,18 +3,18 @@ using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
-    public class ExpressionStatement : Statement
+    internal class ExpressionStatement : Statement
     {
         public Expression Expression { get; }
 
         public ExpressionStatement(Expression expression)
         {
-            Expression = expression;
+            this.Expression = expression;
         }
 
         public override void Execute(Scope scope)
         {
-            var e = Expression.Evaluate(scope);
+            var e = this.Expression.Evaluate(scope);
 
             if (e is AssignmentExpression ae)
             {
@@ -22,26 +22,17 @@ namespace Rillium.Script.Statements
                 return;
             }
 
-            // The case when the script ends with a final variable.
-            if (e is VariableExpression ve)
-            {
-                var ev = ve.Evaluate(scope);
-                if (ev is NumberExpression ne1)
-                {
-                    scope.Set(Constants.OutputValueKey, ne1.Value);
-                    return;
-                }
-
-
-                if (ev is ArrayExpression aa0)
-                {
-                    scope.Set(Constants.OutputValueKey, GetValues(aa0, scope));
-                }
-            }
-
             if (e is NumberExpression ne)
             {
                 scope.Set(Constants.OutputValueKey, ne.Value);
+                return;
+            }
+
+            if (e is LiteralExpression le)
+            {
+                le.ShouldNotBeUnassigned();
+
+                scope.Set(Constants.OutputValueKey, le.Value.Value);
                 return;
             }
 
@@ -69,23 +60,13 @@ namespace Rillium.Script.Statements
             {
                 var r = v.Evaluate(scope);
 
-                if (r is VariableExpression ve)
-                {
-                    var ev = ve.Evaluate(scope);
-                    if (ev is NumberExpression ne1)
-                    {
-                        values.Add(ne1.Value);
-                        continue;
-                    }
-                }
-
                 if (r is NumberExpression ne0)
                 {
                     values.Add(ne0.Value);
                     continue;
                 }
 
-                throw new NotImplementedException("Could not evaluate array expression.");
+                throw new ScriptException("Could not evaluate array expression.");
             }
 
             return values;

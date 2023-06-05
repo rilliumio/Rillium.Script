@@ -2,7 +2,7 @@
 
 namespace Rillium.Script.Expressions
 {
-    public class AssignmentExpression : Expression
+    internal class AssignmentExpression : Expression
     {
         public VariableExpression Target { get; }
         public Expression Value { get; }
@@ -23,7 +23,7 @@ namespace Rillium.Script.Expressions
         {
             if (!scope.HasVariable(Target.Name.Value))
             {
-                token.ThrowScriptException<BadNameException>(
+                Token.ThrowScriptException<BadNameException>(
                     string.Format(Constants.ExceptionMessages.NameDoesNotExist, Target.Name.Value));
             }
 

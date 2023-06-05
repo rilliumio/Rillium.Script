@@ -42,7 +42,7 @@ jobs:
           fail_below_min: true
           format: "markdown"
           output: "both"
-          thresholds: "80 85"
+          thresholds: "95 85"
 
       #  ---  Uncomment when public -----
       #- name: Add Coverage PR Comment

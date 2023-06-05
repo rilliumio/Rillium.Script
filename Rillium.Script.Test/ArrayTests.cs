@@ -69,6 +69,12 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 14, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Sum();"));
             Assert.AreEqual(expected: 8, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Max();"));
             Assert.AreEqual(expected: 5, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Average();"));
+
+            Assert.AreEqual(expected: 2, Evaluator.Evaluate<int>("var x = [2,4,8]; return x.Min();"));
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>("var x = [2,4,8]; return x.Length;"));
+            Assert.AreEqual(expected: 14, Evaluator.Evaluate<int>("var x = [2,4,8]; return x.Sum();"));
+            Assert.AreEqual(expected: 8, Evaluator.Evaluate<int>("var x = [2,4,8]; return x.Max();"));
+            Assert.AreEqual(expected: 5, Evaluator.Evaluate<int>("var x = [2,4,8]; return x.Average();"));
         }
 
         [TestMethod]
@@ -79,6 +85,12 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Min() + 1;"));
             Assert.AreEqual(expected: 9, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Max() + 1;"));
             Assert.AreEqual(expected: 6, Evaluator.Evaluate<int>("var x = [2,4,8]; x.Average() + 1;"));
+
+            Assert.AreEqual(expected: 5, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Length + 1;"));
+            Assert.AreEqual(expected: 16, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Sum() + 1;"));
+            Assert.AreEqual(expected: 4, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Min() + 1;"));
+            Assert.AreEqual(expected: 10, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Max() + 1;"));
+            Assert.AreEqual(expected: 7, Evaluator.Evaluate<int>("var x = [2,4,8]; 1 + x.Average() + 1;"));
         }
 
         [TestMethod]
@@ -120,6 +132,24 @@ namespace Rillium.Script.Test
                            return y;";
 
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>(source));
+        }
+
+        [TestMethod]
+        public void ArrayAggregateExpressionTests6()
+        {
+            var expectedMessage = "Cannot apply indexing with [] on variable 'x' of type 'Identifier'. Line number: 1.";
+            var source = @"var x = 2;
+                           var i = x[1];
+                           return i;";
+
+            TestHelpers.ShouldThrowWithMessage<ScriptException>(source, expectedMessage);
+        }
+
+        [TestMethod]
+        public void ParseLiteralCorrectly()
+        {
+            Assert.AreEqual(expected: 9, Evaluator.Evaluate<int>("var x = [2,4,8]; var y = x.Length + x.Length; x.Length + y;"));
+            Assert.AreEqual(expected: 9, Evaluator.Evaluate<int>("var x = [2,4,8]; var y = x.Length + x.Length; return x.Length + y;"));
         }
     }
 }

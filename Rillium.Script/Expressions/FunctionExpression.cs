@@ -1,6 +1,6 @@
 ﻿namespace Rillium.Script.Expressions
 {
-    public class FunctionExpression : Expression
+    internal class FunctionExpression : Expression
     {
         public string Name { get; }
         public IList<Expression> Arguments { get; }
@@ -8,24 +8,25 @@
         public FunctionExpression(Token token, string name, IList<Expression> arguments)
             : base(token)
         {
-            Name = name;
-            Arguments = arguments;
+            name.ShouldNotBeNull();
+            this.Name = name;
+            this.Arguments = arguments;
         }
 
         public override Expression Evaluate(Scope scope)
         {
-            var f = scope.GetFunction(Name, Arguments.Count);
+            var f = scope.GetFunction(this.Name, this.Arguments.Count);
 
             var functionArguments = new List<object>();
-            for (var i = 0; i < Arguments.Count; i++)
+            for (var i = 0; i < this.Arguments.Count; i++)
             {
                 var argumentType = f.ArgumentTokens[i];
-                functionArguments.Add(Arguments[i].EvaluateToType(argumentType, scope));
+                functionArguments.Add(this.Arguments[i].EvaluateToType(argumentType, scope));
             }
 
             if (f.Out == LiteralTypeId.Number)
             {
-                return new NumberExpression(token, f.Function?.Invoke(
+                return new NumberExpression(this.Token, f.Function?.Invoke(
                        f.ArgumentTokens.Count == 1 ?
                        functionArguments.First() :
                        functionArguments));

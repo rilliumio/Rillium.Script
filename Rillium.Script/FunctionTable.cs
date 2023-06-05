@@ -1,6 +1,8 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Exceptions;
+
+namespace Rillium.Script
 {
-    public class FunctionTable
+    internal class FunctionTable
     {
         private readonly IDictionary<string, IDictionary<int, FunctionInfo>> functions;
 
@@ -19,10 +21,7 @@
 
         public void AddFunction(FunctionInfo functionInfo)
         {
-            if (functionInfo.ArgumentTokens == null)
-            {
-                functionInfo.ArgumentTokens = new List<LiteralTypeId>();
-            }
+            functionInfo.ArgumentTokens ??= new List<LiteralTypeId>();
 
             if (!functions.ContainsKey(functionInfo.Name))
             {
@@ -36,13 +35,14 @@
         {
             if (!functions.ContainsKey(name))
             {
-                throw new ArgumentException($"Unknown function name '{name}'.");
+                throw new BadNameException($"Unknown function name '{name}'.");
             }
 
             var overloads = functions[name];
             if (!overloads.ContainsKey(argumentCount))
             {
-                throw new ArgumentException($"No overload of function '{name}' that takes {argumentCount} arguments.");
+                throw new ScriptException(
+                    $"No overload of function '{name}' that takes {argumentCount} arguments.");
             }
 
             return overloads[argumentCount];
