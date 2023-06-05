@@ -10,49 +10,80 @@ namespace Rillium.Script.Expressions
         public BinaryExpression(Expression left, Token token, Expression right)
             : base(token)
         {
-            Left = left;
-            Right = right;
+            left.ShouldNotBeNull();
+            right.ShouldNotBeNull();
+
+            this.Left = left;
+            this.Right = right;
         }
 
         public override Expression Evaluate(Scope scope)
         {
-            var left = Left.Evaluate(scope);
-            var right = Right.Evaluate(scope);
+            var left = this.Left.Evaluate(scope);
+            var right = this.Right.Evaluate(scope);
 
-            if (left is NumberExpression len && right is NumberExpression lern)
+            if (left is NumberExpression len)
             {
-                return Eval(len, lern);
+                if (right is NumberExpression lern)
+                {
+                    return this.Eval(len, lern);
+                }
+
+                if (right is LiteralExpression lr)
+                {
+                    lr.ShouldNotBeUnassigned();
+
+                    var v = len.Value + (lr.Value?.Value as string);
+                    return this.Token.BuildLiteralExpression(LiteralTypeId.String, v);
+                }
             }
 
             if (left is IdentifierExpression ie)
             {
-                ThrowScriptException<BadNameException>(
+                if (scope.TryGet(ie.Name, out var ee) && ee is LiteralExpression le)
+                {
+                    le.ShouldNotBeUnassigned();
+                }
+
+                this.ThrowScriptException<BadNameException>(
                     string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
             }
 
-            throw new ScriptException("Invalid binary expression.");
+            if (left is LiteralExpression ll)
+            {
+                if (right is LiteralExpression lr)
+                {
+                    var v = (ll.Value?.Value as string) + lr.Value?.Value;
+
+                    return this.Token.BuildLiteralExpression(LiteralTypeId.String, v);
+                }
+
+                if (right is NumberExpression nr)
+                {
+                    var v = (ll.Value?.Value as string) + nr.Value;
+                    return this.Token.BuildLiteralExpression(LiteralTypeId.String, v);
+                }
+            }
+
+            throw new ScriptException($"Line {this.Token.Line + 1}. Invalid binary expression.");
         }
 
         private NumberExpression Eval(NumberExpression ll, NumberExpression lr) =>
-            new NumberExpression(token, Ev(ll.Value, lr.Value));
+            new(this.Token, this.Ev(ll.Value, lr.Value));
 
-        private double Ev(double l, double r)
+        private double Ev(double l, double r) => this.Token.Id switch
         {
-            switch (token.Id)
-            {
-                case TokenId.Plus: return l + r;
-                case TokenId.Minus: return l - r;
-                case TokenId.Star: return l * r;
-                case TokenId.Slash: return l / r;
-                case TokenId.EqualEqual: return l == r ? 1 : 0;
-                case TokenId.Less: return l < r ? 1 : 0;
-                case TokenId.LessEqual: return l <= r ? 1 : 0;
-                case TokenId.Greater: return l > r ? 1 : 0;
-                case TokenId.GreaterEqual: return l >= r ? 1 : 0;
-                default:
-                    throw new ScriptException(
-                    $"Line: {token.Line}. Invalid binary operator '{token.Id}'.");
-            }
-        }
+            TokenId.Plus => l + r,
+            TokenId.Minus => l - r,
+            TokenId.Star => l * r,
+            TokenId.Slash => l / r,
+            TokenId.EqualEqual => l == r ? 1 : 0,
+            TokenId.Less => l < r ? 1 : 0,
+            TokenId.LessEqual => l <= r ? 1 : 0,
+            TokenId.Greater => l > r ? 1 : 0,
+            TokenId.GreaterEqual => l >= r ? 1 : 0,
+            _ => throw new ScriptException(
+                                $"Line: {this.Token.Line}. Invalid binary operator '{this.Token.Id}'."),
+        };
     }
 }

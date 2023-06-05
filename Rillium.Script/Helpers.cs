@@ -1,23 +1,55 @@
-﻿using Rillium.Script.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script
 {
     internal static class Helpers
     {
+        public static LiteralExpression BuildLiteralExpression(this Token token)
+        {
+            var typeId = Convert(token.Id);
+            return new LiteralExpression(
+                token,
+                new LiteralValue()
+                {
+                    TypeId = typeId,
+                    Value = typeId == LiteralTypeId.Bool ? token.Id == TokenId.True : token.Value,
+                });
+        }
+
+        public static LiteralExpression BuildLiteralExpression(this Token token, LiteralTypeId id, object? v)
+        {
+            return new LiteralExpression(token, new LiteralValue() { TypeId = id, Value = v });
+        }
+
+        private static LiteralTypeId Convert(TokenId tokenId)
+        {
+            switch (tokenId)
+            {
+                case TokenId.True:
+                case TokenId.False:
+                    return LiteralTypeId.Bool;
+
+                case TokenId.Number:
+                    return LiteralTypeId.Number;
+
+                case TokenId.String:
+                    return LiteralTypeId.String;
+
+                default:
+                    throw new ArgumentException(
+                    $"Invalid token {tokenId}. Cannot " +
+                    $"convert to {nameof(LiteralTypeId)}.");
+            }
+        }
+
         public static bool EvaluateToBool(this Expression ex, Scope scope)
         {
             var e = ex;
             while (true)
             {
-                if (e is NumberExpression ne)
-                {
-                    return IsTrue(ne.Value);
-                }
-
-                if (e is LiteralExpression le)
-                {
-                    return IsTrue(le.Value);
-                }
+                if (e is NumberExpression ne) { return IsTrue(ne.Value); }
 
                 e = ex.Evaluate(scope);
             }
@@ -33,11 +65,6 @@ namespace Rillium.Script
                     return ne.Value;
                 }
 
-                if (e is LiteralExpression le)
-                {
-                    return (double)le.Value.Value;
-                }
-
                 e = ex.Evaluate(scope);
             }
         }
@@ -51,13 +78,19 @@ namespace Rillium.Script
             }
         }
 
-
         public static ArraySummaryId GetArraySummaryId(this Token token)
         {
             return (ArraySummaryId)Enum.Parse(typeof(ArraySummaryId), token.Value);
         }
 
-        private static bool IsTrue(LiteralValue literalValue) => IsTrue(literalValue.Value);
+        public static void ShouldNotBeNull(
+            [NotNull] this object? value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        {
+            if (value == null)
+            {
+                throw new NullReferenceException($"'{paramName}' should not be null.");
+            }
+        }
 
         private static bool IsTrue(object? value)
         {
@@ -65,7 +98,7 @@ namespace Rillium.Script
             if (value is bool b) { return b; }
             if (value is double d) { return d != 0; }
 
-            throw new ArgumentException($"Could not evaluate bool from '{value}'.");
+            throw new ScriptException($"Could not evaluate bool from '{value}'.");
         }
     }
 }

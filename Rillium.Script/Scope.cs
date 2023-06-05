@@ -12,11 +12,11 @@ namespace Rillium.Script
             this.functions = functions;
         }
 
-        public bool HasVariable(string name) => store.ContainsKey(name);
+        public bool HasVariable(string name) => this.store.ContainsKey(name);
 
         public object? Get(Token token)
         {
-            if (TryGet(token.Value, out var value)) { return value; }
+            if (this.TryGet(token.Value, out var value)) { return value; }
 
             token.ThrowScriptException<BadNameException>(
                 string.Format(Constants.ExceptionMessages.NameDoesNotExist, token.Value));
@@ -25,12 +25,12 @@ namespace Rillium.Script
         }
 
         public bool TryGet(string key, out object? value) =>
-            store.TryGetValue(key, out value);
+            this.store.TryGetValue(key, out value);
 
-        public void Set(string key, object value) =>
-            store[key] = value;
+        public void Set(string key, object? value) =>
+            this.store[key] = value;
 
-        public FunctionInfo GetFunction(string name, int arguementCout) =>
-            functions.GetFunction(name, arguementCout);
+        public FunctionInfo GetFunction(string name, int argumentCout) =>
+            this.functions.GetFunction(name, argumentCout);
     }
 }

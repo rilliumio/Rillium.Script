@@ -9,179 +9,187 @@
 
         public Lexer(string input, ISet<string> functionNames)
         {
-            _input = input;
-            _position = 0;
+            this._input = input;
+            this._position = 0;
             this.functionNames = functionNames;
         }
 
         public Token NextToken()
         {
-            while (_position < _input.Length)
+            while (this._position < this._input.Length)
             {
-                var currentChar = _input[_position];
+                var currentChar = this._input[this._position];
 
                 // Whitespace
                 if (char.IsWhiteSpace(currentChar))
                 {
-                    if (currentChar == '\n') { _lineNumber++; }
-                    ConsumeChar();
+                    if (currentChar == '\n') { this._lineNumber++; }
+                    this.ConsumeChar();
                     continue;
                 }
 
                 // Operators and delimiters
                 if (currentChar == '+')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Plus, "+", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Plus, "+", this._lineNumber);
                 }
                 if (currentChar == '-')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Minus, "-", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Minus, "-", this._lineNumber);
                 }
                 if (currentChar == '*')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Star, "*", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Star, "*", this._lineNumber);
                 }
                 if (currentChar == '/')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Slash, "/", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Slash, "/", this._lineNumber);
                 }
                 if (currentChar == '(')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.LeftParen, "(", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.LeftParen, "(", this._lineNumber);
                 }
                 if (currentChar == ')')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.RightParen, ")", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.RightParen, ")", this._lineNumber);
                 }
                 if (currentChar == '{')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.LeftBrace, "{", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.LeftBrace, "{", this._lineNumber);
                 }
                 if (currentChar == '}')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.RightBrace, "}", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.RightBrace, "}", this._lineNumber);
                 }
 
                 if (currentChar == '[')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.LeftSquareBracket, "[", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.LeftSquareBracket, "[", this._lineNumber);
                 }
 
                 if (currentChar == ']')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.RightSquareBracket, "[", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.RightSquareBracket, "[", this._lineNumber);
                 }
 
                 if (currentChar == ',')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Comma, ",", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Comma, ",", this._lineNumber);
                 }
 
                 if (currentChar == ';')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Semicolon, ";", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Semicolon, ";", this._lineNumber);
                 }
 
                 if (currentChar == '=')
                 {
-                    ConsumeChar();
-                    if (_input[_position] == '=')
+                    this.ConsumeChar();
+                    if (this._input[this._position] == '=')
                     {
-                        ConsumeChar();
-                        return new Token(TokenId.EqualEqual, "==", _lineNumber);
+                        this.ConsumeChar();
+                        return new Token(TokenId.EqualEqual, "==", this._lineNumber);
                     }
 
-                    return new Token(TokenId.Equal, "=", _lineNumber);
+                    return new Token(TokenId.Equal, "=", this._lineNumber);
                 }
 
                 if (currentChar == '>')
                 {
-                    ConsumeChar();
-                    if (_input[_position] == '=')
+                    this.ConsumeChar();
+                    if (this._input[this._position] == '=')
                     {
-                        ConsumeChar();
-                        return new Token(TokenId.GreaterEqual, ">=", _lineNumber);
+                        this.ConsumeChar();
+                        return new Token(TokenId.GreaterEqual, ">=", this._lineNumber);
                     }
 
-                    return new Token(TokenId.Greater, ">", _lineNumber);
+                    return new Token(TokenId.Greater, ">", this._lineNumber);
                 }
 
                 if (currentChar == '<')
                 {
-                    ConsumeChar();
-                    if (_input[_position] == '=')
+                    this.ConsumeChar();
+                    if (this._input[this._position] == '=')
                     {
-                        ConsumeChar();
-                        return new Token(TokenId.LessEqual, "<=", _lineNumber);
+                        this.ConsumeChar();
+                        return new Token(TokenId.LessEqual, "<=", this._lineNumber);
                     }
 
-                    return new Token(TokenId.Less, "<", _lineNumber);
+                    return new Token(TokenId.Less, "<", this._lineNumber);
                 }
 
 
                 if (currentChar == '.')
                 {
-                    ConsumeChar();
-                    return new Token(TokenId.Dot, ".", _lineNumber);
+                    this.ConsumeChar();
+                    return new Token(TokenId.Dot, ".", this._lineNumber);
                 }
 
 
                 // Numbers
                 if (char.IsDigit(currentChar))
                 {
-                    return new Token(TokenId.Number, ConsumeNumber(), _lineNumber);
+                    return new Token(TokenId.Number, this.ConsumeNumber(), this._lineNumber);
+                }
+
+                if (currentChar == '"' || currentChar == '\'')
+                {
+                    this.ConsumeChar();
+                    return new Token(TokenId.String, this.ConsumeString(currentChar), this._lineNumber);
                 }
 
                 // Identifiers
                 if (char.IsLetter(currentChar))
                 {
-                    var word = ConsumeIdentifier();
-                    if (word == "if") { return new Token(TokenId.If, null, _lineNumber); }
-                    if (word == "else") { return new Token(TokenId.Else, null, _lineNumber); }
-                    if (word == "for") { return new Token(TokenId.For, null, _lineNumber); }
-                    if (word == "var") { return new Token(TokenId.Var, null, _lineNumber); }
-                    if (word == "return") { return new Token(TokenId.Return, null, _lineNumber); }
+                    var word = this.ConsumeIdentifier();
+                    if (word == "if") { return new Token(TokenId.If, null, this._lineNumber); }
+                    if (word == "else") { return new Token(TokenId.Else, null, this._lineNumber); }
+                    if (word == "for") { return new Token(TokenId.For, null, this._lineNumber); }
+                    if (word == "var") { return new Token(TokenId.Var, null, this._lineNumber); }
+                    if (word == "return") { return new Token(TokenId.Return, null, this._lineNumber); }
+                    if (word == "true") { return new Token(TokenId.True, null, this._lineNumber); }
+                    if (word == "false") { return new Token(TokenId.False, null, this._lineNumber); }
 
-                    if (functionNames.Contains(word))
+                    if (this.functionNames.Contains(word))
                     {
-                        return new Token(TokenId.Function, word, _lineNumber);
+                        return new Token(TokenId.Function, word, this._lineNumber);
                     }
 
-                    return new Token(TokenId.Identifier, word, _lineNumber);
+                    return new Token(TokenId.Identifier, word, this._lineNumber);
                 }
 
                 // Invalid character
-                throw new ArgumentException($"Invalid character '{currentChar}' at position {_position}");
+                throw new ArgumentException($"Invalid character '{currentChar}' at position {this._position}");
             }
 
-            return new Token(TokenId.Eof, string.Empty, _lineNumber);
+            return new Token(TokenId.Eof, string.Empty, this._lineNumber);
         }
 
         private void ConsumeChar()
         {
-            _position++;
+            this._position++;
         }
 
         private string ConsumeNumber()
         {
-            var start = _position;
+            var start = this._position;
             var hasPeriod = false;
 
-            while (_position < _input.Length && (char.IsDigit(_input[_position]) || _input[_position] == '.'))
+            while (this._position < this._input.Length && (char.IsDigit(this._input[this._position]) || this._input[this._position] == '.'))
             {
-                if (_input[_position] == '.')
+                if (this._input[this._position] == '.')
                 {
                     if (hasPeriod)
                     {
@@ -191,21 +199,33 @@
                     hasPeriod = true;
                 }
 
-                _position++;
+                this._position++;
             }
 
-            return _input.Substring(start, _position - start);
+            return this._input.Substring(start, this._position - start);
         }
 
         private string ConsumeIdentifier()
         {
-            var start = _position;
-            while (_position < _input.Length && (char.IsLetterOrDigit(_input[_position]) || _input[_position] == '_'))
+            var start = this._position;
+            while (this._position < this._input.Length && (char.IsLetterOrDigit(this._input[this._position]) || this._input[this._position] == '_'))
             {
-                _position++;
+                this._position++;
             }
-            return _input.Substring(start, _position - start);
+            return this._input.Substring(start, this._position - start);
+        }
+
+        private string ConsumeString(char quote)
+        {
+            var start = this._position;
+            while (this._position < this._input.Length && this._input[this._position] != quote)
+            {
+                this._position++;
+            }
+
+            return (this._position < this._input.Length && this._input[this._position] == quote)
+                ? this._input[start..this._position++]
+                : throw new ScriptException($"Line {this._lineNumber + 1}. {quote} expected.");
         }
     }
-
 }

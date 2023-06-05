@@ -16,19 +16,19 @@ namespace Rillium.Script
             this.lexer = lexer;
             this.ouput = ouput;
             this.functions = functions;
-            currentToken = lexer.NextToken();
+            this.currentToken = lexer.NextToken();
         }
 
-        public object Parse()
+        public object? Parse()
         {
-            var scope = new Scope(functions);
+            var scope = new Scope(this.functions);
 
             while (true)
             {
-                EatSemiColons();
-                if (currentToken.Id == TokenId.Eof) { break; }
+                this.EatSemiColons();
+                if (this.currentToken.Id == TokenId.Eof) { break; }
 
-                var statement = ParseStatement(scope);
+                var statement = this.ParseStatement(scope);
                 if (statement is ReturnStatement returnStatement)
                 {
                     return returnStatement.EvaluateReturnExpression(scope);
@@ -36,12 +36,12 @@ namespace Rillium.Script
 
                 statement.Execute(scope);
 
-                if (currentToken.Id == TokenId.Eof || statement == null) { break; }
-                EatSemiColons();
+                if (this.currentToken.Id == TokenId.Eof || statement == null) { break; }
+                this.EatSemiColons();
 
             }
 
-            ouput.Flush();
+            this.ouput.Flush();
 
             if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
             {
@@ -54,87 +54,41 @@ namespace Rillium.Script
 
         private void EatSemiColons()
         {
-            while (currentToken.Id == TokenId.Semicolon)
+            while (this.currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenId.Semicolon);
+                this.Eat(TokenId.Semicolon);
             }
         }
 
         private Expression ParseArithmeticExpression()
         {
-            var leftExpr = ParseTerm();
+            var leftExpr = this.ParseTerm();
 
-            while (currentToken.Id == TokenId.Plus
-                || currentToken.Id == TokenId.Minus
-                || currentToken.Id == TokenId.EqualEqual
-                || currentToken.Id == TokenId.Less
-                || currentToken.Id == TokenId.LessEqual
-                || currentToken.Id == TokenId.Greater
-                || currentToken.Id == TokenId.GreaterEqual)
+            while (this.currentToken.Id == TokenId.Plus
+                || this.currentToken.Id == TokenId.Minus
+                || this.currentToken.Id == TokenId.EqualEqual
+                || this.currentToken.Id == TokenId.Less
+                || this.currentToken.Id == TokenId.LessEqual
+                || this.currentToken.Id == TokenId.Greater
+                || this.currentToken.Id == TokenId.GreaterEqual)
             {
-                var op = currentToken;
-                Eat(op.Id);
-                var rightExpr = ParseTerm();
+                var op = this.currentToken;
+                this.Eat(op.Id);
+                var rightExpr = this.ParseTerm();
                 leftExpr = new BinaryExpression(leftExpr, op, rightExpr);
             }
             return leftExpr;
         }
 
-
-        private Expression ParseBinaryExpression(Expression leftExpression, int precedence)
-        {
-            while (true)
-            {
-                var tokenPrecedence = GetPrecedence(currentToken.Id);
-
-                if (tokenPrecedence < precedence)
-                {
-                    return leftExpression;
-                }
-
-                Eat(currentToken.Id);
-
-                var rightExpression = ParsePrimaryExpression();
-
-                var nextToken = currentToken;
-                var nextPrecedence = GetPrecedence(nextToken.Id);
-
-                if (nextPrecedence > tokenPrecedence)
-                {
-                    rightExpression = ParseBinaryExpression(rightExpression, tokenPrecedence + 1);
-                }
-
-                leftExpression = new BinaryExpression(leftExpression, currentToken, rightExpression);
-            }
-        }
-
-        private int GetPrecedence(TokenId tokenType)
-        {
-            switch (tokenType)
-            {
-                case TokenId.Plus:
-                case TokenId.Minus:
-                    return 1;
-
-                case TokenId.Star:
-                case TokenId.Slash:
-                    return 2;
-
-                default:
-                    return 0;
-            }
-        }
-
-
         // Parse a term
         private Expression ParseTerm()
         {
-            var leftFactor = ParseFactor();
-            while (currentToken.Id == TokenId.Star || currentToken.Id == TokenId.Slash)
+            var leftFactor = this.ParseFactor();
+            while (this.currentToken.Id == TokenId.Star || this.currentToken.Id == TokenId.Slash)
             {
-                var operatorToken = currentToken;
-                Eat(operatorToken.Id);
-                var rightFactor = ParseFactor();
+                var operatorToken = this.currentToken;
+                this.Eat(operatorToken.Id);
+                var rightFactor = this.ParseFactor();
                 leftFactor = new BinaryExpression(leftFactor, operatorToken, rightFactor);
             }
             return leftFactor;
@@ -144,45 +98,46 @@ namespace Rillium.Script
         private Expression ParseFactor()
         {
             var isNegative = false;
-            if (currentToken.Id == TokenId.Minus)
+            if (this.currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
-                Eat(TokenId.Minus);
+                this.Eat(TokenId.Minus);
             }
 
-            if (currentToken.Id == TokenId.Number)
+            if (this.currentToken.Id == TokenId.Number)
             {
-                var numberToken = currentToken;
-                Eat(TokenId.Number);
+                var numberToken = this.currentToken;
+                this.Eat(TokenId.Number);
 
                 var d = double.Parse(numberToken.Value);
                 if (isNegative) { d = -d; }
 
                 return new NumberExpression(numberToken, d);
             }
-            if (currentToken.Id == TokenId.Identifier)
+
+            if (this.currentToken.Id == TokenId.Identifier)
             {
-                var identifierExpression = ParseIdentifierExpression();
+                var identifierExpression = this.ParseIdentifierExpression();
 
                 return (isNegative)
                     ? new BinaryExpression(
-                        new NumberExpression(currentToken, -1),
-                        new Token(TokenId.Star, null, currentToken.Line),
+                        new NumberExpression(this.currentToken, -1),
+                        new Token(TokenId.Star, null, this.currentToken.Line),
                         identifierExpression)
                     : identifierExpression;
             }
-            else if (currentToken.Id == TokenId.LeftParen)
+            else if (this.currentToken.Id == TokenId.LeftParen)
             {
 
-                Eat(TokenId.LeftParen);
-                var expr = ParseArithmeticExpression();
-                Eat(TokenId.RightParen);
+                this.Eat(TokenId.LeftParen);
+                var expr = this.ParseArithmeticExpression();
+                this.Eat(TokenId.RightParen);
 
                 if (isNegative)
                 {
                     return new BinaryExpression(
-                        new NumberExpression(currentToken, -1),
-                        new Token(TokenId.Star, null, currentToken.Line),
+                        new NumberExpression(this.currentToken, -1),
+                        new Token(TokenId.Star, null, this.currentToken.Line),
                         expr);
                 }
                 return expr;
@@ -190,112 +145,106 @@ namespace Rillium.Script
             else
             {
                 throw new InvalidOperationException(
-                    $"Invalid token {currentToken.Value} found " +
+                    $"Invalid token {this.currentToken.Value} found " +
                     $"when expecting an integer or a left parenthesis.");
             }
         }
 
         private DeclarationStatement ParseDeclarationStatement(Scope scope)
         {
-            Eat(TokenId.Var);
-            var indentifier = currentToken;
+            this.Eat(TokenId.Var);
+            var identifier = this.currentToken;
 
-            scope.Set(indentifier.Value, null);
+            scope.Set(identifier.Value, null);
 
-            Eat(TokenId.Identifier);
+            this.Eat(TokenId.Identifier);
 
-            if (currentToken.Id == TokenId.Semicolon)
+            if (this.currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenId.Semicolon);
+                this.Eat(TokenId.Semicolon);
                 return new DeclarationStatement(
-                    indentifier,
+                    identifier,
                     new LiteralExpression(
-                        indentifier,
+                        identifier,
                         new LiteralValue()
                         {
                             Value = null,
-                            TypeId = LiteralTypeId.Unknown
+                            TypeId = LiteralTypeId.UnAssigned
                         }));
             }
 
-            Eat(TokenId.Equal);
+            this.Eat(TokenId.Equal);
 
             // Parse expression
-            var initializer = ParseExpression();
+            var initializer = this.ParseExpression();
 
-            return new DeclarationStatement(indentifier, initializer);
+            return new DeclarationStatement(identifier, initializer);
         }
 
         private ReturnStatement ParseReturnStatement()
         {
-            Eat(TokenId.Return);
-            return new ReturnStatement(ParseExpression());
+            this.Eat(TokenId.Return);
+            return new ReturnStatement(this.ParseExpression());
         }
 
         // Parse an if statement
         private IfStatement ParseIfStatement(Scope scope)
         {
-            Eat(TokenId.If);
-            Eat(TokenId.LeftParen);
-            var condition = ParseArithmeticExpression();
-            Eat(TokenId.RightParen);
+            this.Eat(TokenId.If);
+            this.Eat(TokenId.LeftParen);
+            var condition = this.ParseArithmeticExpression();
+            this.Eat(TokenId.RightParen);
 
 
-            var thenStatement = ParseBlockStatement(scope);
-            Statement elseStatement = null;
-            if (currentToken.Id == TokenId.Else)
+            var thenStatement = this.ParseBlockStatement(scope);
+            Statement? elseStatement = null;
+            if (this.currentToken.Id == TokenId.Else)
             {
-                Eat(TokenId.Else);
-                elseStatement = ParseBlockStatement(scope);
+                this.Eat(TokenId.Else);
+                elseStatement = this.ParseBlockStatement(scope);
             }
             return new IfStatement(condition, thenStatement, elseStatement);
         }
 
         // Parse a for loop statement
-        private ExpressionStatement ParseIdentifierStatement()
-        {
-            return new ExpressionStatement(ParseIdentifierExpression());
-        }
-
-        // Parse a for loop statement
         private ForLoopStatement ParseForLoopStatement(Scope scope)
         {
-            Eat(TokenId.For);
-            Eat(TokenId.LeftParen);
-            var init = ParseStatement(scope);
-            Eat(TokenId.Semicolon);
-            var condition = ParseExpression();
-            Eat(TokenId.Semicolon);
-            var increment = ParseStatement(scope);
-            Eat(TokenId.RightParen);
-            var body = ParseBlockStatement(scope);
+            this.Eat(TokenId.For);
+            this.Eat(TokenId.LeftParen);
+            var init = this.ParseStatement(scope);
+            this.Eat(TokenId.Semicolon);
+            var condition = this.ParseExpression();
+            this.Eat(TokenId.Semicolon);
+            var increment = this.ParseStatement(scope);
+            this.Eat(TokenId.RightParen);
+            var body = this.ParseBlockStatement(scope);
             return new ForLoopStatement(init, condition, increment, body);
         }
 
         private Expression ParseExpression()
         {
-            var expr = ParsePrimaryExpression();
-            if (currentToken.Id == TokenId.Comma) { return expr; }
+            var expr = this.ParsePrimaryExpression();
+            if (this.currentToken.Id == TokenId.Comma) { return expr; }
 
-            return ParseToRight(expr);
+            return this.ParseToRight(expr);
         }
 
         private Expression ParseToRight(Expression? expr)
         {
-            while (currentToken.Id == TokenId.Plus ||
-                   currentToken.Id == TokenId.Minus ||
-                   currentToken.Id == TokenId.Star ||
-                   currentToken.Id == TokenId.Slash ||
-                   currentToken.Id == TokenId.EqualEqual ||
-                   currentToken.Id == TokenId.Less ||
-                   currentToken.Id == TokenId.LessEqual ||
-                   currentToken.Id == TokenId.Greater ||
-                   currentToken.Id == TokenId.GreaterEqual)
+            while (this.currentToken.Id == TokenId.Plus ||
+                   this.currentToken.Id == TokenId.Minus ||
+                   this.currentToken.Id == TokenId.Star ||
+                   this.currentToken.Id == TokenId.Slash ||
+                   this.currentToken.Id == TokenId.EqualEqual ||
+                   this.currentToken.Id == TokenId.Less ||
+                   this.currentToken.Id == TokenId.LessEqual ||
+                   this.currentToken.Id == TokenId.Greater ||
+                   this.currentToken.Id == TokenId.GreaterEqual)
             {
-                var op = currentToken;
-                Eat(op.Id);
+                var op = this.currentToken;
+                this.Eat(op.Id);
 
-                var right = ParsePrimaryExpression();
+                var right = this.ParsePrimaryExpression();
                 expr = new BinaryExpression(expr, op, right);
             }
 
@@ -304,20 +253,23 @@ namespace Rillium.Script
 
         private Expression? ParsePrimaryExpression()
         {
-            var token = currentToken;
+            var token = this.currentToken;
             switch (token.Id)
             {
                 case TokenId.Identifier:
-                    return ParseIdentifierExpression();
+                    return this.ParseIdentifierExpression();
+                case TokenId.String:
                 case TokenId.Number:
                 case TokenId.Minus:
-                    return ParseLiteralExpression();
+                case TokenId.True:
+                case TokenId.False:
+                    return this.ParseLiteralExpression();
                 case TokenId.LeftParen:
-                    return ParseGroupingExpression();
+                    return this.ParseGroupingExpression();
                 case TokenId.LeftSquareBracket:
-                    return ParseArrayExpression();
+                    return this.ParseArrayExpression();
                 case TokenId.Function:
-                    return ParseFunctionExpression();
+                    return this.ParseFunctionExpression();
                 default:
                     throw new Exception($"Unexpected token type: {token.Id}");
             }
@@ -326,120 +278,116 @@ namespace Rillium.Script
         private Expression ParseLiteralExpression()
         {
             var isNegative = false;
-            if (currentToken.Id == TokenId.Minus)
+            if (this.currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
-                Eat(TokenId.Minus);
+                this.Eat(TokenId.Minus);
             }
 
-            var token = currentToken;
+            var token = this.currentToken;
             switch (token.Id)
             {
+                case TokenId.String:
+                case TokenId.True:
+                case TokenId.False:
+                    this.Eat(token.Id);
+                    return token.BuildLiteralExpression();
+
                 case TokenId.Number:
-                    Eat(TokenId.Number);
+                    this.Eat(TokenId.Number);
 
                     var d = double.Parse(token.Value);
                     if (isNegative) { d = -d; }
                     return new NumberExpression(token, d);
 
                 case TokenId.LeftParen:
-                    var groupingExpressing = ParseGroupingExpression();
+                    var groupingExpressing = this.ParseGroupingExpression();
                     return (isNegative)
                         ? new BinaryExpression(
                             new NumberExpression(token, -1),
-                            new Token(TokenId.Star, null, currentToken.Line),
+                            new Token(TokenId.Star, null, this.currentToken.Line),
                             groupingExpressing)
                         : groupingExpressing;
 
                 default:
-                    throw new Exception($"Invalid literal expression: {currentToken.Id}");
+                    throw new ScriptException($"Invalid literal expression: {this.currentToken.Id}");
             }
         }
 
         private Expression ParseLiteralArrayExpression()
         {
             var isNegative = false;
-            if (currentToken.Id == TokenId.Minus)
+            if (this.currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
-                Eat(TokenId.Minus);
+                this.Eat(TokenId.Minus);
             }
 
-            var token = currentToken;
+            var token = this.currentToken;
             switch (token.Id)
             {
                 case TokenId.Number:
-                    Eat(TokenId.Number);
+                    this.Eat(TokenId.Number);
 
                     var d = double.Parse(token.Value);
                     if (isNegative) { d = -d; }
                     return new NumberExpression(token, d);
 
-                case TokenId.LeftParen:
-                    var groupingExpressing = ParseGroupingExpression();
-                    return (isNegative)
-                        ? new BinaryExpression(
-                            new NumberExpression(token, -1),
-                            new Token(TokenId.Star, null, currentToken.Line),
-                            groupingExpressing)
-                        : groupingExpressing;
-
                 default:
-                    throw new Exception($"Invalid literal expression: {currentToken.Id}");
+                    throw new Exception($"Invalid literal expression: {this.currentToken.Id}");
             }
         }
 
         private Expression ParseGroupingExpression()
         {
-            Eat(TokenId.LeftParen);
-            var expr = ParseExpression();
-            Eat(TokenId.RightParen);
+            this.Eat(TokenId.LeftParen);
+            var expr = this.ParseExpression();
+            this.Eat(TokenId.RightParen);
             return expr;
         }
 
         private Expression ParseArrayExpression()
         {
-            Eat(TokenId.LeftSquareBracket);
+            this.Eat(TokenId.LeftSquareBracket);
             var expressionList = new List<Expression>();
             while (true)
             {
-                var expr = ParseLiteralArrayExpression();
+                var expr = this.ParseLiteralArrayExpression();
                 expressionList.Add(expr);
 
-                if (currentToken.Id != TokenId.Comma || currentToken.Id == TokenId.RightSquareBracket)
+                if (this.currentToken.Id != TokenId.Comma || this.currentToken.Id == TokenId.RightSquareBracket)
                 {
                     break;
                 }
 
-                Eat(TokenId.Comma);
+                this.Eat(TokenId.Comma);
             }
 
-            Eat(TokenId.RightSquareBracket);
-            return new ArrayExpression(currentToken, expressionList);
+            this.Eat(TokenId.RightSquareBracket);
+            return new ArrayExpression(this.currentToken, expressionList);
         }
-
 
         private BlockStatement ParseBlockStatement(Scope scope)
         {
             var statements = new List<Statement>();
 
-            Eat(TokenId.LeftBrace);
+            this.Eat(TokenId.LeftBrace);
 
             while (
-                currentToken.Id != TokenId.RightBrace &&
-                currentToken.Id != TokenId.Semicolon &&
-                currentToken.Id != TokenId.Eof)
+                this.currentToken.Id != TokenId.RightBrace &&
+                this.currentToken.Id != TokenId.Semicolon &&
+                this.currentToken.Id != TokenId.Eof)
             {
-                statements.Add(ParseStatement(scope));
+                statements.Add(this.ParseStatement(scope));
 
             }
 
-            while (currentToken.Id == TokenId.Semicolon)
+            while (this.currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenId.Semicolon);
+                this.Eat(TokenId.Semicolon);
             }
 
-            Eat(TokenId.RightBrace);
+            this.Eat(TokenId.RightBrace);
 
             return new BlockStatement(statements);
         }
@@ -447,139 +395,155 @@ namespace Rillium.Script
         // Parse a statement
         private Statement? ParseStatement(Scope scope)
         {
-            switch (currentToken.Id)
+            switch (this.currentToken.Id)
             {
                 case TokenId.Var:
-                    return ParseDeclarationStatement(scope);
+                    return this.ParseDeclarationStatement(scope);
                 case TokenId.If:
-                    return ParseIfStatement(scope);
+                    return this.ParseIfStatement(scope);
                 case TokenId.LeftBrace:
-                    return ParseBlockStatement(scope);
+                    return this.ParseBlockStatement(scope);
                 case TokenId.For:
-                    return ParseForLoopStatement(scope);
+                    return this.ParseForLoopStatement(scope);
                 case TokenId.Identifier:
-                    return ParseIdentifierStatement();
+                    return new ExpressionStatement(this.ParseIdentifierExpression());
                 case TokenId.Function:
-                    return new ExpressionStatement(ParseFunctionExpression());
+                    return new ExpressionStatement(this.ParseFunctionExpression());
                 case TokenId.Semicolon:
-                    return new ExpressionStatement(new LiteralExpression(currentToken, null));
+                    return new ExpressionStatement(new LiteralExpression(this.currentToken, null));
+                case TokenId.String:
+                    return new ExpressionStatement(this.ParseLiteralExpression());
                 case TokenId.LeftParen:
                 case TokenId.Minus:
                 case TokenId.Number:
-                    return new ExpressionStatement(ParseArithmeticExpression());
+                    return new ExpressionStatement(this.ParseArithmeticExpression());
+                case TokenId.True:
+                case TokenId.False:
+                    return this.ParseBooleanExpressionStatement();
                 case TokenId.Return:
-                    return ParseReturnStatement();
+                    return this.ParseReturnStatement();
                 case TokenId.Eof:
                     return null;
                 default:
-                    throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting a statement");
+                    throw new InvalidOperationException(
+                        $"Invalid token '{this.currentToken.Id}' " +
+                        $"found when expecting a statement");
             }
+        }
+
+        private Statement ParseBooleanExpressionStatement()
+        {
+            var token = this.currentToken;
+            this.EatOne(TokenId.True, TokenId.False);
+            return new ExpressionStatement(token.BuildLiteralExpression());
         }
 
         private Expression ParseFunctionExpression()
         {
-            var functionToken = currentToken;
-            Eat(TokenId.Function);
-            Eat(TokenId.LeftParen);
+            var functionToken = this.currentToken;
+
+            this.Eat(TokenId.Function);
+            this.Eat(TokenId.LeftParen);
 
             var arguments = new List<Expression>();
-            while (currentToken.Id != TokenId.RightParen)
+            while (this.currentToken.Id != TokenId.RightParen)
             {
-                if (currentToken.Id == TokenId.Comma) { Eat(TokenId.Comma); }
+                if (this.currentToken.Id == TokenId.Comma) { this.Eat(TokenId.Comma); }
 
-                arguments.Add(ParseExpression());
+                arguments.Add(this.ParseExpression());
             }
 
-            Eat(TokenId.RightParen);
+            this.Eat(TokenId.RightParen);
 
             return new FunctionExpression(
                 functionToken,
-                functionToken.Value, arguments);
+                functionToken.Value!,
+                arguments);
         }
 
         private Expression ParseIdentifierExpression()
         {
-            var token = currentToken;
-            Eat(TokenId.Identifier);
+            var token = this.currentToken;
+            this.Eat(TokenId.Identifier);
 
 
-            if (currentToken.Id == TokenId.Semicolon)
+            if (this.currentToken.Id == TokenId.Semicolon)
             {
-                Eat(TokenId.Semicolon);
+                this.Eat(TokenId.Semicolon);
                 return new VariableExpression(token);
             }
 
 
-            if (currentToken.Id == TokenId.LeftSquareBracket)
+            if (this.currentToken.Id == TokenId.LeftSquareBracket)
             {
-                Eat(TokenId.LeftSquareBracket);
-                var indexValueExpression = ParseExpression();
-                Eat(TokenId.RightSquareBracket);
+                this.Eat(TokenId.LeftSquareBracket);
+                var indexValueExpression = this.ParseExpression();
+                this.Eat(TokenId.RightSquareBracket);
 
                 var idxExpr = new IndexExpression(
-                            currentToken,
+                            this.currentToken,
                             new VariableExpression(token),
                             indexValueExpression);
 
-                if (currentToken.Id == TokenId.Semicolon)
+                if (this.currentToken.Id == TokenId.Semicolon)
                 {
-                    Eat(TokenId.Semicolon);
+                    this.Eat(TokenId.Semicolon);
                     return idxExpr;
                 }
 
-                return ParseToRight(idxExpr);
+                return this.ParseToRight(idxExpr);
             }
 
-            if (currentToken.Id == TokenId.Dot)
+            if (this.currentToken.Id == TokenId.Dot)
             {
-                Eat(TokenId.Dot);
-                var dotName = currentToken;
+                this.Eat(TokenId.Dot);
+                var dotName = this.currentToken;
 
-                EatOne(TokenId.Identifier, TokenId.Function);
+                this.EatOne(TokenId.Identifier, TokenId.Function);
 
                 var arraySummaryId = dotName.GetArraySummaryId();
                 if (arraySummaryId != ArraySummaryId.Length)
                 {
-                    Eat(TokenId.LeftParen);
-                    Eat(TokenId.RightParen);
+                    this.Eat(TokenId.LeftParen);
+                    this.Eat(TokenId.RightParen);
                 }
 
-                var arrayAggragate = new ArraySummaryExpression(
+                var arrayAggregate = new ArraySummaryExpression(
                            token,
                            new VariableExpression(token),
                            arraySummaryId);
 
-                if (currentToken.Id == TokenId.Semicolon)
+                if (this.currentToken.Id == TokenId.Semicolon)
                 {
-                    return arrayAggragate;
+                    return arrayAggregate;
                 }
 
-                var operatorToken = currentToken;
-                Eat(operatorToken.Id);
-                return new BinaryExpression(arrayAggragate, operatorToken, ParseExpression());
+                var operatorToken = this.currentToken;
+                this.Eat(operatorToken.Id);
+                return new BinaryExpression(arrayAggregate, operatorToken, this.ParseExpression());
             }
 
-            if (currentToken.Id == TokenId.Equal)
+            if (this.currentToken.Id == TokenId.Equal)
             {
 
-                Eat(TokenId.Equal);
-                var expression = ParseExpression();
+                this.Eat(TokenId.Equal);
+                var expression = this.ParseExpression();
                 return new AssignmentExpression(token, new VariableExpression(token), expression);
             }
 
-            return ParseToRight(new IdentifierExpression(token));
+            return this.ParseToRight(new IdentifierExpression(token));
         }
 
         // Helper method to advance to the next token
         private void Eat(TokenId expectedType)
         {
-            if (currentToken.Id == expectedType)
+            if (this.currentToken.Id == expectedType)
             {
-                currentToken = lexer.NextToken();
+                this.currentToken = this.lexer.NextToken();
             }
             else
             {
-                throw new InvalidOperationException($"Invalid token '{currentToken.Value}' found when expecting {expectedType}");
+                throw new InvalidOperationException($"Invalid token '{this.currentToken.Value}' found when expecting {expectedType}");
             }
         }
 
@@ -592,15 +556,15 @@ namespace Rillium.Script
         {
             foreach (var expectedType in expectedTypes)
             {
-                if (currentToken.Id == expectedType)
+                if (this.currentToken.Id == expectedType)
                 {
-                    currentToken = lexer.NextToken();
+                    this.currentToken = this.lexer.NextToken();
                     return;
                 }
             }
 
             throw new InvalidOperationException(
-                $"Invalid token '{currentToken.Value}' found when " +
+                $"Invalid token '{this.currentToken.Value}' found when " +
                 $"expecting one of the following: {string.Join(',', $"'{expectedTypes}'")}");
         }
     }

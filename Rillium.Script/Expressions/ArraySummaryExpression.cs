@@ -2,8 +2,8 @@
 {
     internal class ArraySummaryExpression : Expression
     {
-        private Expression array;
-        private ArraySummaryId arraySummaryId;
+        private readonly Expression array;
+        private readonly ArraySummaryId arraySummaryId;
 
         public ArraySummaryExpression(Token token, Expression array, ArraySummaryId arraySummaryId)
             : base(token)
@@ -23,19 +23,19 @@
             switch (arraySummaryId)
             {
                 case ArraySummaryId.Length:
-                    return new NumberExpression(token, ae.Value.Count);
+                    return new NumberExpression(Token, ae.Value.Count);
 
                 case ArraySummaryId.Sum:
-                    return new NumberExpression(token, GetList(ae, scope).Sum());
+                    return new NumberExpression(Token, GetList(ae, scope).Sum());
 
                 case ArraySummaryId.Max:
-                    return new NumberExpression(token, GetList(ae, scope).Max());
+                    return new NumberExpression(Token, GetList(ae, scope).Max());
 
                 case ArraySummaryId.Min:
-                    return new NumberExpression(token, GetList(ae, scope).Min());
+                    return new NumberExpression(Token, GetList(ae, scope).Min());
 
                 case ArraySummaryId.Average:
-                    return new NumberExpression(token, GetList(ae, scope).Average());
+                    return new NumberExpression(Token, GetList(ae, scope).Average());
 
                 default: throw new NotImplementedException($"Invalid aggregate identifier '{arraySummaryId}'.");
             }

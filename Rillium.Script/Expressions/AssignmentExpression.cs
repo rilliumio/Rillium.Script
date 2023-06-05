@@ -23,7 +23,7 @@ namespace Rillium.Script.Expressions
         {
             if (!scope.HasVariable(Target.Name.Value))
             {
-                token.ThrowScriptException<BadNameException>(
+                Token.ThrowScriptException<BadNameException>(
                     string.Format(Constants.ExceptionMessages.NameDoesNotExist, Target.Name.Value));
             }
 

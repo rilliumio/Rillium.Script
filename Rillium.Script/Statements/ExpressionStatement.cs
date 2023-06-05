@@ -9,12 +9,12 @@ namespace Rillium.Script.Statements
 
         public ExpressionStatement(Expression expression)
         {
-            Expression = expression;
+            this.Expression = expression;
         }
 
         public override void Execute(Scope scope)
         {
-            var e = Expression.Evaluate(scope);
+            var e = this.Expression.Evaluate(scope);
 
             if (e is AssignmentExpression ae)
             {
@@ -25,6 +25,14 @@ namespace Rillium.Script.Statements
             if (e is NumberExpression ne)
             {
                 scope.Set(Constants.OutputValueKey, ne.Value);
+                return;
+            }
+
+            if (e is LiteralExpression le)
+            {
+                le.ShouldNotBeUnassigned();
+
+                scope.Set(Constants.OutputValueKey, le.Value.Value);
                 return;
             }
 

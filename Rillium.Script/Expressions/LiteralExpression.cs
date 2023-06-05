@@ -7,19 +7,28 @@
         public LiteralExpression(Token token, LiteralValue value)
             : base(token)
         {
-            Value = value;
+            this.Value = value;
         }
 
         public override Expression Evaluate(Scope scope)
         {
-            switch (Value.TypeId)
+            switch (this.Value.TypeId)
             {
+                case LiteralTypeId.Bool:
                 case LiteralTypeId.String:
-                case LiteralTypeId.Unknown:
+                case LiteralTypeId.UnAssigned:
                     return this;
                 default:
                     throw new InvalidOperationException(
-                        $"Could not evaluate literal expression with value type '{Value.TypeId}'.");
+                        $"Could not evaluate literal expression with value type '{this.Value.TypeId}'.");
+            }
+        }
+
+        public void ShouldNotBeUnassigned()
+        {
+            if (this.Value.TypeId == LiteralTypeId.UnAssigned)
+            {
+                this.Token.ThrowScriptException<ScriptException>(string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, this.Token.Value));
             }
         }
     }

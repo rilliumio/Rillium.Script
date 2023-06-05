@@ -3,7 +3,9 @@
     public enum LiteralTypeId
     {
         String,
+        Bool,
         Number,
-        Unknown,
+        Null,
+        UnAssigned,
     }
 }

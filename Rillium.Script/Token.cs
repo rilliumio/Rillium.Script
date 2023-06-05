@@ -3,16 +3,16 @@
     public class Token
     {
         public TokenId Id { get; }
-        public string Value { get; }
+        public string? Value { get; }
         public int Line { get; }
 
-        public Token(TokenId tokenId, string value, int line)
+        public Token(TokenId tokenId, string? value, int line)
         {
-            Id = tokenId;
-            Value = value;
-            Line = line;
+            this.Id = tokenId;
+            this.Value = value;
+            this.Line = line;
         }
 
-        public override string ToString() => $"{Id}: {Value}";
+        public override string ToString() => $"{this.Id}: {this.Value}";
     }
 }
