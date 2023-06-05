@@ -4,7 +4,7 @@ using Rillium.Script.Expressions;
 namespace Rillium.Script.Test.ExpressionTests
 {
     [TestClass]
-    public class LiteralExpressionTests
+    public class FunctionExpressionTests
     {
         [TestMethod]
         public void BadLiteralTypeIdShouldThrow()

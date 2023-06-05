@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Test
 {
@@ -16,5 +17,10 @@ namespace Rillium.Script.Test
             Assert.AreEqual(
                 expectedExceptionMessage,
                 Assert.ThrowsException<T>(() => Evaluator.Evaluate<object>(source)).Message);
+
+        public static void ShouldThrowWithMessage<T>(this Expression expression, string expectedExceptionMessage) where T : Exception =>
+          Assert.AreEqual(
+              expectedExceptionMessage,
+              Assert.ThrowsException<T>(() => expression.Evaluate(null)).Message);
     }
 }

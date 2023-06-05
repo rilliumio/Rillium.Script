@@ -20,7 +20,7 @@
                     return this;
                 default:
                     throw new InvalidOperationException(
-                        $"Could not evaluate literal expression with value type '{this.Value.TypeId}'.");
+                        $"Line {this.Token.Line + 1}. Could not evaluate literal expression with value type '{this.Value.TypeId}'.");
             }
         }
 

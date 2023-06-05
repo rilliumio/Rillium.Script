@@ -18,10 +18,9 @@ namespace Rillium.Script
         {
             if (this.TryGet(token.Value, out var value)) { return value; }
 
-            token.ThrowScriptException<BadNameException>(
-                string.Format(Constants.ExceptionMessages.NameDoesNotExist, token.Value));
-
-            return null;
+            throw new BadNameException(
+                $"Line {token.Line + 1}. " +
+                $"{string.Format(Constants.ExceptionMessages.NameDoesNotExist, token.Value)}");
         }
 
         public bool TryGet(string key, out object? value) =>
@@ -30,7 +29,7 @@ namespace Rillium.Script
         public void Set(string key, object? value) =>
             this.store[key] = value;
 
-        public FunctionInfo GetFunction(string name, int argumentCout) =>
-            this.functions.GetFunction(name, argumentCout);
+        public FunctionInfo GetFunction(string name, int argumentCount) =>
+            this.functions.GetFunction(name, argumentCount);
     }
 }
