@@ -1,4 +1,5 @@
-﻿using Rillium.Script.Expressions;
+﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Expressions;
 using Rillium.Script.Statements;
 
 namespace Rillium.Script
@@ -19,9 +20,10 @@ namespace Rillium.Script
             this.currentToken = lexer.NextToken();
         }
 
-        public object? Parse()
+        public object? Parse(params object[]? args)
         {
             var scope = new Scope(this.functions);
+            scope.InitializeScopeArguments(args);
 
             while (true)
             {
@@ -34,7 +36,14 @@ namespace Rillium.Script
                     return returnStatement.EvaluateReturnExpression(scope);
                 }
 
-                statement.Execute(scope);
+                try
+                {
+                    statement.Execute(scope);
+                }
+                catch (ReturnStatementException returnStatementException)
+                {
+                    return returnStatementException.returnStatement.EvaluateReturnExpression(scope);
+                }
 
                 if (this.currentToken.Id == TokenId.Eof || statement == null) { break; }
                 this.EatSemiColons();
@@ -63,10 +72,20 @@ namespace Rillium.Script
         private Expression ParseArithmeticExpression()
         {
             var leftExpr = this.ParseTerm();
+            if (this.currentToken.Id == TokenId.RightParen)
+            {
+                return leftExpr;
+            }
+
+            if (this.currentToken.Id == TokenId.Number)
+            {
+                throw new SyntaxException($"Line {this.currentToken.Line + 1}. Syntax error. Expected operator.");
+            }
 
             while (this.currentToken.Id == TokenId.Plus
                 || this.currentToken.Id == TokenId.Minus
                 || this.currentToken.Id == TokenId.EqualEqual
+                || this.currentToken.Id == TokenId.BangEqual
                 || this.currentToken.Id == TokenId.Less
                 || this.currentToken.Id == TokenId.LessEqual
                 || this.currentToken.Id == TokenId.Greater
@@ -104,12 +123,22 @@ namespace Rillium.Script
                 this.Eat(TokenId.Minus);
             }
 
+            if (this.currentToken.Id == TokenId.True)
+            {
+                this.Eat(TokenId.True);
+                return this.currentToken.BuildLiteralExpression(LiteralTypeId.Bool, true);
+            }
+
             if (this.currentToken.Id == TokenId.Number)
             {
                 var numberToken = this.currentToken;
                 this.Eat(TokenId.Number);
 
-                var d = double.Parse(numberToken.Value);
+                if (!double.TryParse(numberToken.Value, out var d))
+                {
+                    throw new SyntaxException($"Line {numberToken.Line + 1}. Syntax error. Invalid number.");
+                }
+
                 if (isNegative) { d = -d; }
 
                 return new NumberExpression(numberToken, d);
@@ -130,7 +159,7 @@ namespace Rillium.Script
             {
 
                 this.Eat(TokenId.LeftParen);
-                var expr = this.ParseArithmeticExpression();
+                var expr = this.ParseExpression();
                 this.Eat(TokenId.RightParen);
 
                 if (isNegative)
@@ -236,6 +265,7 @@ namespace Rillium.Script
                    this.currentToken.Id == TokenId.Star ||
                    this.currentToken.Id == TokenId.Slash ||
                    this.currentToken.Id == TokenId.EqualEqual ||
+                   this.currentToken.Id == TokenId.BangEqual ||
                    this.currentToken.Id == TokenId.Less ||
                    this.currentToken.Id == TokenId.LessEqual ||
                    this.currentToken.Id == TokenId.Greater ||
@@ -314,30 +344,6 @@ namespace Rillium.Script
             }
         }
 
-        private Expression ParseLiteralArrayExpression()
-        {
-            var isNegative = false;
-            if (this.currentToken.Id == TokenId.Minus)
-            {
-                isNegative = true;
-                this.Eat(TokenId.Minus);
-            }
-
-            var token = this.currentToken;
-            switch (token.Id)
-            {
-                case TokenId.Number:
-                    this.Eat(TokenId.Number);
-
-                    var d = double.Parse(token.Value);
-                    if (isNegative) { d = -d; }
-                    return new NumberExpression(token, d);
-
-                default:
-                    throw new Exception($"Invalid literal expression: {this.currentToken.Id}");
-            }
-        }
-
         private Expression ParseGroupingExpression()
         {
             this.Eat(TokenId.LeftParen);
@@ -352,7 +358,7 @@ namespace Rillium.Script
             var expressionList = new List<Expression>();
             while (true)
             {
-                var expr = this.ParseLiteralArrayExpression();
+                var expr = this.ParseLiteralExpression();
                 expressionList.Add(expr);
 
                 if (this.currentToken.Id != TokenId.Comma || this.currentToken.Id == TokenId.RightSquareBracket)
@@ -411,15 +417,14 @@ namespace Rillium.Script
                     return new ExpressionStatement(this.ParseFunctionExpression());
                 case TokenId.Semicolon:
                     return new ExpressionStatement(new LiteralExpression(this.currentToken, null));
-                case TokenId.String:
-                    return new ExpressionStatement(this.ParseLiteralExpression());
                 case TokenId.LeftParen:
                 case TokenId.Minus:
                 case TokenId.Number:
                     return new ExpressionStatement(this.ParseArithmeticExpression());
+                case TokenId.String:
                 case TokenId.True:
                 case TokenId.False:
-                    return this.ParseBooleanExpressionStatement();
+                    return new ExpressionStatement(this.ParseExpression());
                 case TokenId.Return:
                     return this.ParseReturnStatement();
                 case TokenId.Eof:
@@ -429,13 +434,6 @@ namespace Rillium.Script
                         $"Invalid token '{this.currentToken.Id}' " +
                         $"found when expecting a statement");
             }
-        }
-
-        private Statement ParseBooleanExpressionStatement()
-        {
-            var token = this.currentToken;
-            this.EatOne(TokenId.True, TokenId.False);
-            return new ExpressionStatement(token.BuildLiteralExpression());
         }
 
         private Expression ParseFunctionExpression()

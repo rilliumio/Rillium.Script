@@ -1,4 +1,6 @@
-﻿namespace Rillium.Script
+﻿using Rillium.Script.Exceptions;
+
+namespace Rillium.Script
 {
     public class Lexer
     {
@@ -73,13 +75,18 @@
                 if (currentChar == '[')
                 {
                     this.ConsumeChar();
+                    if (this._input[this._position] == ']')
+                    {
+                        throw new SyntaxException($"Line {this._lineNumber + 1}. Value expected.");
+                    }
+
                     return new Token(TokenId.LeftSquareBracket, "[", this._lineNumber);
                 }
 
                 if (currentChar == ']')
                 {
                     this.ConsumeChar();
-                    return new Token(TokenId.RightSquareBracket, "[", this._lineNumber);
+                    return new Token(TokenId.RightSquareBracket, "]", this._lineNumber);
                 }
 
                 if (currentChar == ',')
@@ -128,6 +135,18 @@
                     }
 
                     return new Token(TokenId.Less, "<", this._lineNumber);
+                }
+
+                if (currentChar == '!')
+                {
+                    this.ConsumeChar();
+                    if (this._input[this._position] == '=')
+                    {
+                        this.ConsumeChar();
+                        return new Token(TokenId.BangEqual, "!=", this._lineNumber);
+                    }
+
+                    return new Token(TokenId.Bang, "!", this._lineNumber);
                 }
 
 
@@ -185,20 +204,10 @@
         private string ConsumeNumber()
         {
             var start = this._position;
-            var hasPeriod = false;
+            //var hasPeriod = false;
 
             while (this._position < this._input.Length && (char.IsDigit(this._input[this._position]) || this._input[this._position] == '.'))
             {
-                if (this._input[this._position] == '.')
-                {
-                    if (hasPeriod)
-                    {
-                        throw new ArgumentException("Invalid number.");
-                    }
-
-                    hasPeriod = true;
-                }
-
                 this._position++;
             }
 

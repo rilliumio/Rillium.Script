@@ -10,10 +10,8 @@
 
         }
 
-
         public override Expression Evaluate(Scope scope) =>
-             (Expression)scope.Get(this.Token);
-
+            (Expression)scope.Get(this.Token);
     }
 
 }

@@ -5,7 +5,7 @@ using Rillium.Script.Statements;
 namespace Rillium.Script.Test.StatementTests
 {
     [TestClass]
-    public class ReturnStatementTests
+    public class DeclarationStatementTests
     {
         [TestMethod]
         public void ReturnStatementExecuteShouldThrow()

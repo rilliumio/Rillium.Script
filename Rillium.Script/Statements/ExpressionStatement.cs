@@ -44,12 +44,13 @@ namespace Rillium.Script.Statements
 
             if (e is IdentifierExpression ie)
             {
-                ie.ThrowScriptException<BadNameException>(
-                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
+                throw new BadNameException(
+                    $"Line {ie.Token.Line + 1}. {string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name)}");
             }
 
-            e.ThrowScriptException<ScriptException>(
-                $"Expression type {e.GetType().Name} not handled.");
+            throw new ScriptException(
+                  $"Line {e.Token.Line + 1}. " +
+                  $"Expression type {e.GetType().Name} not handled.");
         }
 
         private static List<object> GetValues(ArrayExpression aa, Scope scope)

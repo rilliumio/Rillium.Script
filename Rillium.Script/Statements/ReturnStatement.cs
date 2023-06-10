@@ -1,4 +1,5 @@
-﻿using Rillium.Script.Expressions;
+﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
@@ -19,8 +20,10 @@ namespace Rillium.Script.Statements
             {
                 if (literalExpression.Value.TypeId == LiteralTypeId.UnAssigned)
                 {
-                    literalExpression.ThrowScriptException<ScriptException>(
-                        string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, expression.Token.Value));
+
+                    throw new ScriptException(
+                      $"Line {literalExpression.Token.Line + 1}. " +
+                      string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, expression.Token.Value));
                 }
             }
 
@@ -28,6 +31,6 @@ namespace Rillium.Script.Statements
         }
 
         public override void Execute(Scope scope) =>
-            throw new NotImplementedException();
+            throw new ReturnStatementException(this);
     }
 }

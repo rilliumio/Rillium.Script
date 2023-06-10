@@ -45,16 +45,47 @@ namespace Rillium.Script.Expressions
                     le.ShouldNotBeUnassigned();
                 }
 
-                this.ThrowScriptException<BadNameException>(
-                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name));
+                throw new BadNameException(
+                    $"Line {this.Token.Line + 1}. " +
+                    $"{string.Format(Constants.ExceptionMessages.NameDoesNotExist, ie.Name)}");
             }
 
             if (left is LiteralExpression ll)
             {
                 if (right is LiteralExpression lr)
                 {
-                    var v = (ll.Value?.Value as string) + lr.Value?.Value;
+                    if (ll.Value.TypeId == LiteralTypeId.Bool && lr.Value.TypeId == LiteralTypeId.Bool)
+                    {
+                        if (this.Token.Id == TokenId.EqualEqual)
+                        {
+                            return this.Token.BuildLiteralExpression(
+                                LiteralTypeId.Bool,
+                                (bool)ll.Value.Value! == (bool)lr.Value.Value!);
+                        }
 
+                        if (this.Token.Id == TokenId.BangEqual)
+                        {
+                            return this.Token.BuildLiteralExpression(
+                                LiteralTypeId.Bool,
+                                (bool)ll.Value.Value! != (bool)lr.Value.Value!);
+                        }
+                    }
+
+                    if (this.Token.Id == TokenId.EqualEqual)
+                    {
+                        return this.Token.BuildLiteralExpression(
+                            LiteralTypeId.Bool,
+                            (ll.Value?.Value as string) == (lr.Value?.Value as string));
+                    }
+
+                    if (this.Token.Id == TokenId.BangEqual)
+                    {
+                        return this.Token.BuildLiteralExpression(
+                            LiteralTypeId.Bool,
+                            (ll.Value?.Value as string) != (lr.Value?.Value as string));
+                    }
+
+                    var v = (ll.Value?.Value as string) + lr.Value?.Value;
                     return this.Token.BuildLiteralExpression(LiteralTypeId.String, v);
                 }
 
@@ -78,12 +109,13 @@ namespace Rillium.Script.Expressions
             TokenId.Star => l * r,
             TokenId.Slash => l / r,
             TokenId.EqualEqual => l == r ? 1 : 0,
+            TokenId.BangEqual => l != r ? 1 : 0,
             TokenId.Less => l < r ? 1 : 0,
             TokenId.LessEqual => l <= r ? 1 : 0,
             TokenId.Greater => l > r ? 1 : 0,
             TokenId.GreaterEqual => l >= r ? 1 : 0,
             _ => throw new ScriptException(
-                                $"Line: {this.Token.Line}. Invalid binary operator '{this.Token.Id}'."),
+                                $"Line: {this.Token.Line + 1}. Invalid binary operator '{this.Token.Id}'."),
         };
     }
 }

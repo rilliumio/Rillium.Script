@@ -18,5 +18,21 @@ namespace Rillium.Script.Test.ExpressionTests
 
             ex.ShouldThrowWithMessage<InvalidOperationException>(expectedMessage);
         }
+
+        [TestMethod]
+        public void InvalidArgumentConversionTypeStringToDouble()
+        {
+            var expectedMessage = $"Line 1. Cannot convert type String to double.";
+
+            var functionToken = new Token(TokenId.Function, "Abs", 0);
+            var literalValueToken = new Token(TokenId.String, "1", 0);
+
+            var unexpectedExpressionType = new FunctionExpression(
+                functionToken,
+                functionToken.Value!,
+                new List<Expression>() { literalValueToken.BuildLiteralExpression() });
+
+            unexpectedExpressionType.ShouldThrowWithMessage<ScriptException>(expectedMessage);
+        }
     }
 }
