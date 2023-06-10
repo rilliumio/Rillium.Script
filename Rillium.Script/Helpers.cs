@@ -49,6 +49,11 @@ namespace Rillium.Script
             var e = ex;
             while (true)
             {
+                if (e is LiteralExpression le && le.Value.TypeId == LiteralTypeId.Bool)
+                {
+                    return le.Value.Value is true;
+                }
+
                 if (e is NumberExpression ne) { return IsTrue(ne.Value); }
 
                 e = ex.Evaluate(scope);
@@ -84,6 +89,39 @@ namespace Rillium.Script
                 case LiteralTypeId.Number: return EvaluateToDouble(ex, scope);
                 default: throw new NotImplementedException($"Expression conversion to {nameof(literalTypeId)} '{literalTypeId}' not implemented.");
             }
+        }
+
+        public static void InitializeScopeArguments(this Scope scope, object[]? args)
+        {
+            if (args == null) { return; }
+
+            var token = new Token(TokenId.Identifier, Constants.EntryArgumentParameterName, 0);
+            scope.Set(
+                Constants.EntryArgumentParameterName,
+                new ArrayExpression(token, ToArrayExpression(args)));
+        }
+
+        private static List<Expression> ToArrayExpression(object[] args)
+        {
+            args.ShouldNotBeNull();
+            return args.Select(x => LiteralArgToExpression(x)).ToList();
+        }
+
+        private static Expression LiteralArgToExpression(object arg)
+        {
+            if (arg is bool b) { return BuildLiteralExpression(new Token(b ? TokenId.True : TokenId.False, null, 0), LiteralTypeId.Bool, b); }
+
+            if (arg is byte bt) { return new NumberExpression(new Token(TokenId.Number, null, 0), bt); }
+
+            if (arg is int i) { return new NumberExpression(new Token(TokenId.Number, null, 0), i); }
+            if (arg is short s) { return new NumberExpression(new Token(TokenId.Number, null, 0), s); }
+            if (arg is double d) { return new NumberExpression(new Token(TokenId.Number, null, 0), d); }
+            if (arg is long l) { return new NumberExpression(new Token(TokenId.Number, null, 0), l); }
+            if (arg is decimal dec) { return new NumberExpression(new Token(TokenId.Number, null, 0), (double)dec); }
+
+            if (arg is string str) { return BuildLiteralExpression(new Token(TokenId.String, null, 0), LiteralTypeId.String, str); }
+
+            throw new ArgumentException($"Argument type of '{arg.GetType().Name}' not supported.");
         }
 
         public static ArraySummaryId GetArraySummaryId(this Token token)

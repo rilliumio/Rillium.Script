@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rillium.Script.Exceptions;
 
 namespace Rillium.Script.Test
 {
@@ -8,7 +9,6 @@ namespace Rillium.Script.Test
         [TestMethod]
         public void SingleValue()
         {
-
             Assert.AreEqual(expected: (byte)1, Evaluator.Evaluate<byte>("1"));
             Assert.AreEqual(expected: (byte)1, Evaluator.Evaluate<byte>("1;"));
             Assert.AreEqual(expected: (byte)1, Evaluator.Evaluate<byte>("return 1;"));
@@ -46,6 +46,22 @@ namespace Rillium.Script.Test
         public void Decimal()
         {
             Assert.AreEqual(expected: 1.1, Evaluator.Evaluate<double>("1.1"));
+        }
+
+        [TestMethod]
+        public void BadNumberShouldThrow()
+        {
+            const string message = "Line 1. Syntax error. Invalid number.";
+            TestHelpers.ShouldThrowWithMessage<SyntaxException>("1.1.0", message);
+            TestHelpers.ShouldThrowWithMessage<SyntaxException>("1.1.0;", message);
+        }
+
+        [TestMethod]
+        public void NumbersWithoutOperatorShouldThrow()
+        {
+            const string message = "Line 1. Syntax error. Expected operator.";
+            TestHelpers.ShouldThrowWithMessage<SyntaxException>("1 1", message);
+            TestHelpers.ShouldThrowWithMessage<SyntaxException>("1 1;", message);
         }
 
         [TestMethod]

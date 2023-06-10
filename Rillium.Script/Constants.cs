@@ -3,6 +3,7 @@
     internal class Constants
     {
         public const string OutputValueKey = "__return__";
+        public const string EntryArgumentParameterName = "args";
 
         public class ExceptionMessages
         {

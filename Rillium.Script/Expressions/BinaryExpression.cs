@@ -54,8 +54,38 @@ namespace Rillium.Script.Expressions
             {
                 if (right is LiteralExpression lr)
                 {
-                    var v = (ll.Value?.Value as string) + lr.Value?.Value;
+                    if (ll.Value.TypeId == LiteralTypeId.Bool && lr.Value.TypeId == LiteralTypeId.Bool)
+                    {
+                        if (this.Token.Id == TokenId.EqualEqual)
+                        {
+                            return this.Token.BuildLiteralExpression(
+                                LiteralTypeId.Bool,
+                                (bool)ll.Value.Value! == (bool)lr.Value.Value!);
+                        }
 
+                        if (this.Token.Id == TokenId.BangEqual)
+                        {
+                            return this.Token.BuildLiteralExpression(
+                                LiteralTypeId.Bool,
+                                (bool)ll.Value.Value! != (bool)lr.Value.Value!);
+                        }
+                    }
+
+                    if (this.Token.Id == TokenId.EqualEqual)
+                    {
+                        return this.Token.BuildLiteralExpression(
+                            LiteralTypeId.Bool,
+                            (ll.Value?.Value as string) == (lr.Value?.Value as string));
+                    }
+
+                    if (this.Token.Id == TokenId.BangEqual)
+                    {
+                        return this.Token.BuildLiteralExpression(
+                            LiteralTypeId.Bool,
+                            (ll.Value?.Value as string) != (lr.Value?.Value as string));
+                    }
+
+                    var v = (ll.Value?.Value as string) + lr.Value?.Value;
                     return this.Token.BuildLiteralExpression(LiteralTypeId.String, v);
                 }
 
@@ -79,6 +109,7 @@ namespace Rillium.Script.Expressions
             TokenId.Star => l * r,
             TokenId.Slash => l / r,
             TokenId.EqualEqual => l == r ? 1 : 0,
+            TokenId.BangEqual => l != r ? 1 : 0,
             TokenId.Less => l < r ? 1 : 0,
             TokenId.LessEqual => l <= r ? 1 : 0,
             TokenId.Greater => l > r ? 1 : 0,

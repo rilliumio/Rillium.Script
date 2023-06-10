@@ -94,6 +94,18 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>(source));
         }
 
+        [TestMethod]
+        public void TestVariableIncrementsTest4()
+        {
+            const string source = @"
+                var a = 1;
+                var b = 2;
+                var c = 3;
+                return a + b + c;";
+
+            Assert.AreEqual(expected: 6, Evaluator.Evaluate<int>(source));
+        }
+
         public void UndeclaredVariableTests() =>
             TestHelpers.ShouldThrowWithMessage<BadNameException>("var a = 1; a = b +1; a;", Line1BadName);
 

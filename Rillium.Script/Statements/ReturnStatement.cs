@@ -1,4 +1,5 @@
-﻿using Rillium.Script.Expressions;
+﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
@@ -30,6 +31,6 @@ namespace Rillium.Script.Statements
         }
 
         public override void Execute(Scope scope) =>
-            throw new NotImplementedException();
+            throw new ReturnStatementException(this);
     }
 }

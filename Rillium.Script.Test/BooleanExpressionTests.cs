@@ -33,6 +33,59 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
+        public void BangEqualityTest()
+        {
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("1!=1"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("1!=1;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(1!=1)"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(1!=1);"));
+
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("1!=2"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("1!=2;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("(1!=2)"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("(1!=2);"));
+
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return 1!=1;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return (1!=1);"));
+
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("return 1!=2;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("return (1!=2);"));
+
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("-1!=-1"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("-1!=-1;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return -1!=-1;"));
+
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("-1!=-2"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("-1!=-2;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("return -1!=-2;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("return (-1!=-2);"));
+        }
+
+        [TestMethod]
+        public void BoolEquality()
+        {
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("true == true;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("true == false;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("false == true;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("false == false;"));
+
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("true != true;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("true != false;"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("false != true;"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("false != false;"));
+
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("(true == true);"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(true == false);"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(false == true);"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("(false == false);"));
+
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(true != true);"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("(true != false);"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("(false != true);"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(false != false);"));
+        }
+
+        [TestMethod]
         public void EqualityComparingNegativeNumbersTest()
         {
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("0"));
@@ -105,7 +158,7 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void GreaterEquaNegativeslTest()
+        public void GreaterEqualNegativesTest()
         {
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("-1>=-2"));
             Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("-1>=-2;"));
@@ -196,6 +249,21 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("(-1<=-2);"));
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return -1<=-2;"));
             Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("return (-1<=-2);"));
+        }
+
+        [TestMethod]
+        public void StringEqualityCorrectly()
+        {
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("('a'=='a')"));
+
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("'a'=='a'"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("'a'=='b'"));
+            Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("'a'!='a'"));
+            Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("'a'!='b'"));
+
+            //Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("('a'=='b')"));
+            //Assert.AreEqual(expected: false, Evaluator.Evaluate<bool>("('a'!='a')"));
+            //Assert.AreEqual(expected: true, Evaluator.Evaluate<bool>("('a'!='b')"));
         }
     }
 }
