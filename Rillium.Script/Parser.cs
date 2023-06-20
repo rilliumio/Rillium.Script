@@ -117,6 +117,7 @@ namespace Rillium.Script
         private Expression ParseFactor()
         {
             var isNegative = false;
+
             if (this.currentToken.Id == TokenId.Minus)
             {
                 isNegative = true;
@@ -286,6 +287,8 @@ namespace Rillium.Script
             var token = this.currentToken;
             switch (token.Id)
             {
+                case TokenId.PlusPlus:
+                case TokenId.MinusMinus:
                 case TokenId.Identifier:
                     return this.ParseIdentifierExpression();
                 case TokenId.String:
@@ -412,6 +415,8 @@ namespace Rillium.Script
                 case TokenId.For:
                     return this.ParseForLoopStatement(scope);
                 case TokenId.Identifier:
+                case TokenId.PlusPlus:
+                case TokenId.MinusMinus:
                     return new ExpressionStatement(this.ParseIdentifierExpression());
                 case TokenId.Function:
                     return new ExpressionStatement(this.ParseFunctionExpression());
@@ -430,8 +435,8 @@ namespace Rillium.Script
                 case TokenId.Eof:
                     return null;
                 default:
-                    throw new InvalidOperationException(
-                        $"Invalid token '{this.currentToken.Id}' " +
+                    throw new SyntaxException(
+                        $"Line {this.currentToken.Line + 1}. Invalid token '{this.currentToken.Id}' " +
                         $"found when expecting a statement");
             }
         }
@@ -461,9 +466,18 @@ namespace Rillium.Script
 
         private Expression ParseIdentifierExpression()
         {
-            var token = this.currentToken;
-            this.Eat(TokenId.Identifier);
+            TokenId? preToken = null;
+            if (this.currentToken.Id == TokenId.PlusPlus ||
+                this.currentToken.Id == TokenId.MinusMinus)
+            {
+                preToken = this.currentToken.Id;
+                this.Eat(this.currentToken.Id);
+            }
 
+            var token = this.currentToken;
+            token.PreToken = preToken;
+
+            this.Eat(TokenId.Identifier);
 
             if (this.currentToken.Id == TokenId.Semicolon)
             {
@@ -529,7 +543,13 @@ namespace Rillium.Script
                 return new AssignmentExpression(token, new VariableExpression(token), expression);
             }
 
-            return this.ParseToRight(new IdentifierExpression(token));
+            var nextToken = this.currentToken;
+            if (nextToken.Id == TokenId.PlusPlus || nextToken.Id == TokenId.MinusMinus)
+            {
+                this.EatOne(TokenId.PlusPlus, TokenId.MinusMinus);
+            }
+
+            return this.ParseToRight(new IdentifierExpression(token, nextToken.Id));
         }
 
         // Helper method to advance to the next token

@@ -72,5 +72,15 @@ namespace Rillium.Script.Test
 
             Assert.AreEqual(expected: 6, Evaluator.Evaluate<int>(source));
         }
+        [TestMethod]
+        public void ForLoopIncrementCorrectlyReturn()
+        {
+            const string source = @"
+               var k = 0;
+               for(var i = 0; i < 100; i++) { k++; }
+               return k;";
+
+            Assert.AreEqual(expected: 100, Evaluator.Evaluate<int>(source));
+        }
     }
 }

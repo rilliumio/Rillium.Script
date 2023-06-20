@@ -11,7 +11,7 @@
         Bang, BangEqual,
         Equal, EqualEqual,
         Greater, GreaterEqual,
-        Less, LessEqual,
+        Less, LessEqual, PlusPlus, MinusMinus,
 
         // Literals
         Identifier, String, Number, Function,

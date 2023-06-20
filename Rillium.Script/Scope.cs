@@ -1,4 +1,5 @@
 ﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script
 {
@@ -16,7 +17,25 @@ namespace Rillium.Script
 
         public object? Get(Token token)
         {
-            if (this.TryGet(token.Value, out var value)) { return value; }
+            if (this.TryGet(token.Value, out var value))
+            {
+                if (value is NumberExpression ne && token.PreToken != null)
+                {
+                    if (token.PreToken == TokenId.MinusMinus)
+                    {
+                        ne.Decrement();
+                    }
+
+                    if (token.PreToken == TokenId.PlusPlus)
+                    {
+                        ne.Increment();
+                    }
+
+                    return ne;
+                }
+
+                return value;
+            }
 
             throw new BadNameException(
                 $"Line {token.Line + 1}. " +

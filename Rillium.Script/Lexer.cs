@@ -34,12 +34,26 @@ namespace Rillium.Script
                 if (currentChar == '+')
                 {
                     this.ConsumeChar();
+                    var nextChar = (this._input[this._position]);
+                    if (nextChar == '+')
+                    {
+                        this.ConsumeChar();
+                        return new Token(TokenId.PlusPlus, "++", this._lineNumber);
+                    }
+
                     return new Token(TokenId.Plus, "+", this._lineNumber);
                 }
                 if (currentChar == '-')
                 {
                     this.ConsumeChar();
-                    return new Token(TokenId.Minus, "-", this._lineNumber);
+                    var nextChar = (this._input[this._position]);
+                    if (nextChar == '-')
+                    {
+                        this.ConsumeChar();
+                        return new Token(TokenId.MinusMinus, "--", this._lineNumber);
+                    }
+
+                    return new Token(TokenId.Minus, "--", this._lineNumber);
                 }
                 if (currentChar == '*')
                 {
@@ -190,7 +204,7 @@ namespace Rillium.Script
                 }
 
                 // Invalid character
-                throw new ArgumentException($"Invalid character '{currentChar}' at position {this._position}");
+                throw new SyntaxException($"Line {this._lineNumber + 1}. Invalid character '{currentChar}' at position {this._position}");
             }
 
             return new Token(TokenId.Eof, string.Empty, this._lineNumber);
@@ -204,7 +218,6 @@ namespace Rillium.Script
         private string ConsumeNumber()
         {
             var start = this._position;
-            //var hasPeriod = false;
 
             while (this._position < this._input.Length && (char.IsDigit(this._input[this._position]) || this._input[this._position] == '.'))
             {
