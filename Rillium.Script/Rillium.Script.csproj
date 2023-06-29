@@ -13,15 +13,15 @@
     <PackageTags>dotnet; script; math; parser; </PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>A C-styled script evaluator.</Description>
-    <PackageIcon>Rillium.Script.128.png</PackageIcon>
+    <PackageIcon>Rillium.Script.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\Rillium.Script.128.png">
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\LICENSE">
+    <None Include="..\Rillium.Script.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
