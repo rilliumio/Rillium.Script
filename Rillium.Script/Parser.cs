@@ -191,7 +191,7 @@ namespace Rillium.Script
 
             if (this.currentToken.Id == TokenId.Semicolon)
             {
-                this.Eat(TokenId.Semicolon);
+                this.EatSemiColons();
                 return new DeclarationStatement(
                     identifier,
                     new LiteralExpression(
@@ -242,9 +242,9 @@ namespace Rillium.Script
             this.Eat(TokenId.For);
             this.Eat(TokenId.LeftParen);
             var init = this.ParseStatement(scope);
-            this.Eat(TokenId.Semicolon);
+            this.EatSemiColons();
             var condition = this.ParseExpression();
-            this.Eat(TokenId.Semicolon);
+            this.EatSemiColons();
             var increment = this.ParseStatement(scope);
             this.Eat(TokenId.RightParen);
             var body = this.ParseBlockStatement(scope);
@@ -381,21 +381,16 @@ namespace Rillium.Script
             var statements = new List<Statement>();
 
             this.Eat(TokenId.LeftBrace);
-
+            this.EatSemiColons();
             while (
                 this.currentToken.Id != TokenId.RightBrace &&
                 this.currentToken.Id != TokenId.Semicolon &&
                 this.currentToken.Id != TokenId.Eof)
             {
-                statements.Add(this.ParseStatement(scope));
-
+                statements.Add(this.ParseStatement(scope)!);
             }
 
-            while (this.currentToken.Id == TokenId.Semicolon)
-            {
-                this.Eat(TokenId.Semicolon);
-            }
-
+            this.EatSemiColons();
             this.Eat(TokenId.RightBrace);
 
             return new BlockStatement(statements);
@@ -481,7 +476,7 @@ namespace Rillium.Script
 
             if (this.currentToken.Id == TokenId.Semicolon)
             {
-                this.Eat(TokenId.Semicolon);
+                this.EatSemiColons();
                 return new VariableExpression(token);
             }
 
@@ -499,7 +494,7 @@ namespace Rillium.Script
 
                 if (this.currentToken.Id == TokenId.Semicolon)
                 {
-                    this.Eat(TokenId.Semicolon);
+                    this.EatSemiColons();
                     return idxExpr;
                 }
 
