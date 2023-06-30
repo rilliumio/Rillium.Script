@@ -16,12 +16,22 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void OrderOfOperationsNegativesCorrectly()
+        public void OrderOfOperationsPositivesInAssignmentCorrectly()
+        {
+            foreach (var source in OrderOfOperationsDeps.PositiveCases.Keys)
+            {
+                var assignmentSource = $"var x = {OrderOfOperationsDeps.PositiveCases[source]}; x;";
+                assignmentSource.ShouldEvaluateEqual(OrderOfOperationsDeps.PositiveCases[source]);
+            }
+        }
+
+        [TestMethod]
+        public void OrderOfOperationsNegativesAssignmentCorrectly()
         {
             foreach (var source in OrderOfOperationsDeps.NegativeCases.Keys)
             {
-                source.ShouldEvaluateEqual(
-                    OrderOfOperationsDeps.NegativeCases[source]);
+                var assignmentSource = $"var x = {OrderOfOperationsDeps.NegativeCases[source]}; x;";
+                assignmentSource.ShouldEvaluateEqual(OrderOfOperationsDeps.NegativeCases[source]);
             }
         }
     }

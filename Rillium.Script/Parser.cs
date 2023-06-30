@@ -253,6 +253,11 @@ namespace Rillium.Script
 
         private Expression ParseExpression()
         {
+            if (this.currentToken.Id == TokenId.Number)
+            {
+                return this.ParseArithmeticExpression();
+            }
+
             var expr = this.ParsePrimaryExpression();
             if (this.currentToken.Id == TokenId.Comma) { return expr; }
 

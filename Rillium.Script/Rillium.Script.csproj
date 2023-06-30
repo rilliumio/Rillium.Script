@@ -10,17 +10,17 @@
     <PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
     <Version>0.0.2</Version>
-    <PackageTags>dotnet; script; math; parser; </PackageTags>
+    <PackageTags>dotnet; script; math; parser; evaluator; eval; scripting; evaluation;</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>A C-styled script evaluator.</Description>
     <PackageIcon>Rillium.Script.png</PackageIcon>
+    <Authors>rilliumio</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+	<None Include="..\README.md" Pack="true" PackagePath="" />
+	<None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\Rillium.Script.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
