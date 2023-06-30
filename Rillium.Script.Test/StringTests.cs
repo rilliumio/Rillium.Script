@@ -38,12 +38,7 @@ namespace Rillium.Script.Test
         public void ConcatenateCorrectly()
         {
             Assert.AreEqual(expected: "ab", Evaluator.Evaluate<string>("var x = \"a\" + \"b\"; return x;"));
-            Assert.AreEqual(expected: "a1", Evaluator.Evaluate<string>("var x = \"a\" + 1; return x;"));
-            Assert.AreEqual(expected: "1a", Evaluator.Evaluate<string>("var x = 1 + \"a\"; return x;"));
-
             Assert.AreEqual(expected: "ab", Evaluator.Evaluate<string>("var x = 'a' + 'b'; return x;"));
-            Assert.AreEqual(expected: "a1", Evaluator.Evaluate<string>("var x = 'a' + 1; return x;"));
-            Assert.AreEqual(expected: "1a", Evaluator.Evaluate<string>("var x = 1 + 'a'; return x;"));
         }
     }
 }

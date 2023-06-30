@@ -14,13 +14,13 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>A C-styled script evaluator.</Description>
     <PackageIcon>Rillium.Script.png</PackageIcon>
+    <Authors>rilliumio</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+	<None Include="..\README.md" Pack="true" PackagePath="" />
+	<None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\Rillium.Script.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
