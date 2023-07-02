@@ -40,5 +40,17 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: "ab", Evaluator.Evaluate<string>("var x = \"a\" + \"b\"; return x;"));
             Assert.AreEqual(expected: "ab", Evaluator.Evaluate<string>("var x = 'a' + 'b'; return x;"));
         }
+
+        [TestMethod]
+        public void ConcatenateStringVariablesCorrectly()
+        {
+            var source = @"
+	   		var x = ""foo"";
+			var y = 'bar';
+			var z = x + y;
+            return z;";
+
+            Assert.AreEqual("foobar", Evaluator.Evaluate<string>(source));
+        }
     }
 }
