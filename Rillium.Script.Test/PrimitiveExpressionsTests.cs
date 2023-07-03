@@ -121,9 +121,20 @@ namespace Rillium.Script.Test
         [TestMethod]
         public void ModCorrectly()
         {
-            const string source = "(5 % 7);";
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("15 % 7"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("(15 % 7)"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("return 15 % 7;"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("return (15 % 7);"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("var x = 15 % 7; x;"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("var x = (15 % 7); x;"));
 
-            Assert.AreEqual(expected: (5 % 7), Evaluator.Evaluate<int>(source));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("15.2 % 7.1"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("(15.2 % 7.1)"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("return 15.2 % 7.1;"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("return (15.2 % 7.1);"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("var x = 15.2 % 7.1; x;"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("var x = (15.2 % 7.1); x;"));
+            Assert.AreEqual(expected: 2 + 15.2 % 7.1, Evaluator.Evaluate<int>("var x = (2 + 15.2 % 7.1); x;"));
         }
 
         [TestMethod]
