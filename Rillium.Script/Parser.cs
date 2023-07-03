@@ -103,7 +103,7 @@ namespace Rillium.Script
         private Expression ParseTerm()
         {
             var leftFactor = this.ParseFactor();
-            while (this.currentToken.Id == TokenId.Star || this.currentToken.Id == TokenId.Slash)
+            while (this.currentToken.Id == TokenId.Star || this.currentToken.Id == TokenId.Slash || this.currentToken.Id == TokenId.Percent)
             {
                 var operatorToken = this.currentToken;
                 this.Eat(operatorToken.Id);

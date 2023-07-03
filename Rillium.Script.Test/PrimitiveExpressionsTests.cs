@@ -119,6 +119,14 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
+        public void ModCorrectly()
+        {
+            const string source = "(5 % 7);";
+
+            Assert.AreEqual(expected: (5 % 7), Evaluator.Evaluate<int>(source));
+        }
+
+        [TestMethod]
         public void IfElseCorrectly()
         {
             const string source = "var x =0; if(1==10){ x=1; }else{ x=2;}; x;";
