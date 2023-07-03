@@ -6,7 +6,7 @@
 ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-96%25-forestgreen?style=flat)
 
 Support script evaluation in your dotnet application.
-```cs
+```ts
 using Rillium.Script;
 
 // Simple math parser
@@ -31,10 +31,15 @@ Rillium.Script was created to provide basic scripting functionality that could b
 
 * The risk of malicious code execution is too high, such as allowing users to define code executed by the `Roslyn.Compiler` directly.
 
-Rillium.Script was created out of the need for a simple, secure, and easy-to-use scripting engine. Rillium.Script is designed to be small in scope and to minimize the security attack surface. It is also easy to use, with a simple API that makes it easy to integrate into your applications.
+Rillium.Script was created out of the need for a simple, secure, and easy-to-use script. It is also easy to use, with a simple API that makes it easy to integrate into your applications.
 
 ## Performance
 
 Rillium.Script implements the concept of an LR Parser, that reads the input string from left to right and produces a rightmost derivation in reverse. The parser builds a parse tree and analyzes the structure of the input string. One of the key advantages of the LR Parser is that it can handle a broad class of context-free grammar and generate a deterministic parser from the grammar rules.
 
 The Rillium.Script parser is designed to be fast, reliable, and efficient. It's capable of handling a wide range of syntax structures, including conditional statements, loops, expressions, and more.
+
+## Feedback Welcome!
+If you discover bugs or deficiencies, please create a new [issue](https://github.com/rilliumio/Rillium.Script/issues) with an example script.
+
+For new feature proposals, please raise them for [discussion](https://github.com/rilliumio/Rillium.Script/discussions).

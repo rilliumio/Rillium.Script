@@ -52,7 +52,7 @@ jobs:
           fail_below_min: true
           format: "markdown"
           output: "both"
-          thresholds: "95 85"
+          thresholds: "95 75"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2

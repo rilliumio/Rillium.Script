@@ -5,7 +5,7 @@
 
         // Single-character tokens
         LeftParen, RightParen, LeftBrace, RightBrace, LeftSquareBracket, RightSquareBracket,
-        Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
+        Comma, Dot, Minus, Plus, Semicolon, Slash, Star, Percent,
 
         // One or two character tokens
         Bang, BangEqual,
@@ -17,8 +17,8 @@
         Identifier, String, Number, Function,
 
         // Keywords
-        And, Class, Else, False, Fun, For, If, Nil, Or,
-        Print, Return, Super, This, True, Var, While,
+        And, Else, False, For, If, Nil, Or,
+        Print, Return, True, Var,
 
         // End of file
         Eof

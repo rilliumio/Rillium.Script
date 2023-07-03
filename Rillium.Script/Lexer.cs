@@ -170,6 +170,12 @@ namespace Rillium.Script
                     return new Token(TokenId.Dot, ".", this._lineNumber);
                 }
 
+                if (currentChar == '%')
+                {
+                    this.ConsumeChar();
+                    return new Token(TokenId.Percent, "%", this._lineNumber);
+                }
+
 
                 // Numbers
                 if (char.IsDigit(currentChar))

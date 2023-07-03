@@ -3,7 +3,7 @@
     internal class IdentifierExpression : Expression
     {
         public string Name => this.Token.Value;
-        private TokenId nextTokenId;
+        private readonly TokenId nextTokenId;
 
         public IdentifierExpression(Token token, TokenId nextTokenId)
             : base(token)
@@ -13,9 +13,9 @@
 
         public override Expression Evaluate(Scope scope)
         {
-            if (scope.TryGet(this.Token.Value, out var o) && o != null)
+            if (scope.TryGet(this.Token.Value, out var scopeExpression) && scopeExpression != null)
             {
-                if (o is NumberExpression numberExpression)
+                if (scopeExpression is NumberExpression numberExpression)
                 {
                     if (this.Token.PreToken == TokenId.PlusPlus)
                     {
@@ -45,6 +45,12 @@
                     }
 
                     return numberExpression;
+                }
+
+                if (scopeExpression is LiteralExpression literalExpression
+                    && literalExpression.Value.TypeId != LiteralTypeId.UnAssigned)
+                {
+                    return literalExpression;
                 }
             };
 

@@ -119,6 +119,25 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
+        public void ModCorrectly()
+        {
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("15 % 7"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("(15 % 7)"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("return 15 % 7;"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("return (15 % 7);"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("var x = 15 % 7; x;"));
+            Assert.AreEqual(expected: 15 % 7, Evaluator.Evaluate<int>("var x = (15 % 7); x;"));
+
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("15.2 % 7.1"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("(15.2 % 7.1)"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("return 15.2 % 7.1;"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("return (15.2 % 7.1);"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("var x = 15.2 % 7.1; x;"));
+            Assert.AreEqual(expected: 15.2 % 7.1, Evaluator.Evaluate<int>("var x = (15.2 % 7.1); x;"));
+            Assert.AreEqual(expected: 2 + 15.2 % 7.1, Evaluator.Evaluate<int>("var x = (2 + 15.2 % 7.1); x;"));
+        }
+
+        [TestMethod]
         public void IfElseCorrectly()
         {
             const string source = "var x =0; if(1==10){ x=1; }else{ x=2;}; x;";
