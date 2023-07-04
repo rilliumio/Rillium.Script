@@ -203,8 +203,6 @@ namespace Rillium.Script
                     this.ConsumeChar();
                     return new Token(TokenId.Percent, "%", this.lineNumber);
                 }
-
-
                 // Numbers
                 if (char.IsDigit(currentChar))
                 {
