@@ -8,37 +8,37 @@ namespace Rillium.Script
 
         public FunctionTable()
         {
-            functions = new Dictionary<string, IDictionary<int, FunctionInfo>>();
+            this.functions = new Dictionary<string, IDictionary<int, FunctionInfo>>();
 
-            var defaltFunctions = FunctionHelpers.DefaultFunctions();
-            foreach (var function in defaltFunctions)
+            var defaultFunctions = FunctionHelpers.DefaultFunctions();
+            foreach (var function in defaultFunctions)
             {
-                AddFunction(function);
+                this.AddFunction(function);
             }
         }
 
-        public ISet<string> GetFunctionNames() => functions.Keys.ToHashSet();
+        public ISet<string> GetFunctionNames() => this.functions.Keys.ToHashSet();
 
         public void AddFunction(FunctionInfo functionInfo)
         {
             functionInfo.ArgumentTokens ??= new List<LiteralTypeId>();
 
-            if (!functions.ContainsKey(functionInfo.Name))
+            if (!this.functions.ContainsKey(functionInfo.Name))
             {
-                functions[functionInfo.Name] = new Dictionary<int, FunctionInfo>();
+                this.functions[functionInfo.Name] = new Dictionary<int, FunctionInfo>();
             }
 
-            functions[functionInfo.Name][functionInfo.ArgumentTokens.Count] = functionInfo;
+            this.functions[functionInfo.Name][functionInfo.ArgumentTokens.Count] = functionInfo;
         }
 
         public FunctionInfo GetFunction(string name, int argumentCount)
         {
-            if (!functions.ContainsKey(name))
+            if (!this.functions.ContainsKey(name))
             {
                 throw new BadNameException($"Unknown function name '{name}'.");
             }
 
-            var overloads = functions[name];
+            var overloads = this.functions[name];
             if (!overloads.ContainsKey(argumentCount))
             {
                 throw new ScriptException(

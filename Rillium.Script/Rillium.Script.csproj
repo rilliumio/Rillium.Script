@@ -9,8 +9,8 @@
     <Title>A C-styled script evaluator.</Title>
     <PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
-    <Version>0.0.4</Version>
-    <PackageTags>dotnet; script; math; parser; evaluator; eval; scripting; evaluation;</PackageTags>
+    <Version>0.0.5</Version>
+    <PackageTags>script; math; parser; parse; dotnet; evaluator; eval; scripting; evaluation;</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>A C-styled script evaluator.</Description>
     <PackageIcon>Rillium.Script.png</PackageIcon>
