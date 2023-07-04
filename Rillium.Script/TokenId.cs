@@ -2,7 +2,6 @@
 {
     public enum TokenId
     {
-
         // Single-character tokens
         LeftParen, RightParen, LeftBrace, RightBrace, LeftSquareBracket, RightSquareBracket,
         Comma, Dot, Minus, Plus, Semicolon, Slash, Star, Percent,
@@ -23,5 +22,4 @@
         // End of file
         Eof
     }
-
 }

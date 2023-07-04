@@ -27,11 +27,10 @@ This is an implementation of a c-styled script parser and evaluator. It consists
 ## Security 
 Rillium.Script was created to provide basic scripting functionality that could be modified at runtime without the need to recompile or redeploy. When evaluating other options, such as Roslyn or other script engine projects:
 
-* The scope of these projects are too large for our needs. They included features that were not need, such as debugging support or IDE integration.
+* The scope of these projects are too large for our needs. They included features that were not needed, such as debugging support or IDE integration.
 
 * The risk of malicious code execution is too high, such as allowing users to define code executed by the `Roslyn.Compiler` directly.
 
-Rillium.Script was created out of the need for a simple, secure, and easy-to-use script. It is also easy to use, with a simple API that makes it easy to integrate into your applications.
 
 ## Performance
 
