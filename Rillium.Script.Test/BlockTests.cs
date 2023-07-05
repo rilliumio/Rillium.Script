@@ -35,5 +35,18 @@ namespace Rillium.Script.Test
 
             Assert.AreEqual(expected: 900, Evaluator.Evaluate<int>(source));
         }
+
+        [TestMethod]
+        public void BlockStatement()
+        {
+            const string source = @"
+               var k = 1;
+               {
+                  k = k + 2;
+               }
+               return k;";
+
+            Assert.AreEqual(expected: 3, Evaluator.Evaluate<int>(source));
+        }
     }
 }
