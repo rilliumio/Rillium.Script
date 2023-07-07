@@ -103,6 +103,12 @@ namespace Rillium.Script
         private Expression ParseTerm()
         {
             var leftFactor = this.ParseFactor();
+
+            if (this.currentToken.Id == TokenId.RightParen)
+            {
+                return leftFactor;
+            }
+
             while (this.currentToken.Id == TokenId.Star || this.currentToken.Id == TokenId.Slash || this.currentToken.Id == TokenId.Percent)
             {
                 var operatorToken = this.currentToken;
@@ -143,6 +149,11 @@ namespace Rillium.Script
                 if (isNegative) { d = -d; }
 
                 return new NumberExpression(numberToken, d);
+            }
+
+            if (this.currentToken.Id == TokenId.Function)
+            {
+                return this.ParseFunctionExpression();
             }
 
             if (this.currentToken.Id == TokenId.Identifier)
@@ -266,6 +277,11 @@ namespace Rillium.Script
 
         private Expression ParseToRight(Expression? expr)
         {
+            if (this.currentToken.Id == TokenId.RightParen)
+            {
+                return expr;
+            }
+
             while (this.currentToken.Id == TokenId.Plus ||
                    this.currentToken.Id == TokenId.Minus ||
                    this.currentToken.Id == TokenId.Star ||
@@ -280,7 +296,7 @@ namespace Rillium.Script
                 var op = this.currentToken;
                 this.Eat(op.Id);
 
-                var right = this.ParsePrimaryExpression();
+                var right = this.ParseToRight(this.ParsePrimaryExpression());
                 expr = new BinaryExpression(expr, op, right);
             }
 
@@ -458,10 +474,11 @@ namespace Rillium.Script
 
             this.Eat(TokenId.RightParen);
 
-            return new FunctionExpression(
-                functionToken,
-                functionToken.Value!,
-                arguments);
+            return this.ParseToRight(
+                new FunctionExpression(
+                    functionToken,
+                    functionToken.Value!,
+                    arguments));
         }
 
         private Expression ParseIdentifierExpression()
