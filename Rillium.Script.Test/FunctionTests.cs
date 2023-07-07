@@ -63,9 +63,8 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
-        public void Test()
+        public void MathFunctionsAssignmentTests()
         {
-
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("var x = Abs(-1); x;"));
             Assert.AreEqual(expected: 1, Evaluator.Evaluate<int>("var x = -1; var y = Abs(x); y;"));
             Assert.AreEqual(expected: Math.Abs(-1.1), Evaluator.Evaluate<double>("var x = Abs(-1.1); x;"));
@@ -82,6 +81,22 @@ namespace Rillium.Script.Test
             Assert.AreEqual(expected: Math.Min(-25.1, 2), Evaluator.Evaluate<double>("var x = Min(-25.1, 2); x;"));
             Assert.AreEqual(expected: Math.Min(Math.Abs(-25), 2), Evaluator.Evaluate<int>("var x = Min(Abs(-25), 2); x;"));
             Assert.AreEqual(expected: Math.Min(-25, 2.1), Evaluator.Evaluate<double>("var x = Min(-25, 2.1); x;"));
+        }
+
+        [TestMethod]
+        public void MathFunctionExpressionTests()
+        {
+            Assert.AreEqual(expected: ((1) + (Math.Log(1.5)) * 3), Evaluator.Evaluate<double>("((1) + (Log(1.5)) * 3)"));
+            Assert.AreEqual(expected: (1 + Math.Log(1.5) * 3), Evaluator.Evaluate<double>("(1 + Log(1.5) * 3)"));
+            Assert.AreEqual(expected: ((1) + Math.Log(1.5) * 3), Evaluator.Evaluate<double>("((1) + Log(1.5) * 3)"));
+
+            Assert.AreEqual(expected: 1 + Math.Log(1.5) + 1, Evaluator.Evaluate<double>("1 + Log(1.5) + 1"));
+            Assert.AreEqual(expected: Math.Log(1.5) + 1, Evaluator.Evaluate<double>("Log(1.5) + 1"));
+            Assert.AreEqual(expected: 1 + (Math.Log(1.5)) * 3, Evaluator.Evaluate<double>("1 + (Log(1.5)) * 3"));
+            Assert.AreEqual(expected: (1 + Math.Log(1.5)) * 3, Evaluator.Evaluate<double>("(1 + Log(1.5)) * 3"));
+            Assert.AreEqual(expected: 1 + (Math.Log(1.5) * 3), Evaluator.Evaluate<double>("1 + (Log(1.5) * 3)"));
+            Assert.AreEqual(expected: (1 + ((Math.Log(1.5))) * 3), Evaluator.Evaluate<double>("(1 + ((Log(1.5))) * 3)"));
+            Assert.AreEqual(expected: ((1.0) + ((Math.Log(1.5))) * 3.0), Evaluator.Evaluate<double>("((1.0) + ((Log(1.5))) * 3.0)"));
         }
 
         private static void ShouldEvaluateEqual<T>(string source, T Expected) =>
