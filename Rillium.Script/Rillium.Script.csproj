@@ -25,6 +25,11 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="C:\git\Rillium.io\Rillium.Script\Rillium.Script\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\git\Rillium.io\Rillium.Script\Rillium.Script\.editorconfig" />
   </ItemGroup>
 
 </Project>

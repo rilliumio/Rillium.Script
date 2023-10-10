@@ -8,7 +8,7 @@ namespace Rillium.Script.Statements
         public Statement ThenStatement { get; }
         public Statement ElseStatement { get; }
 
-        public IfStatement(Expression condition, Statement thenStatement, Statement elseStatement = null)
+        public IfStatement(Expression condition, Statement thenStatement, Statement? elseStatement = null)
         {
             Condition = condition;
             ThenStatement = thenStatement;
