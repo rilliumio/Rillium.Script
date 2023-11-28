@@ -1,30 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Company>rillium.io</Company>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>A C-styled script evaluator.</Title>
+    <Title>A math parser and script evaluator.</Title>
     <PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
-    <Version>0.0.6</Version>
+    <Version>0.1.1</Version>
     <PackageTags>script; math; parser; parse; dotnet; evaluator; eval; scripting; evaluation;</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Description>A C-styled script evaluator.</Description>
+    <Description>A simple, fast, and secure math parser and runtime script evaluation with syntax similar to C#.</Description>
     <PackageIcon>Rillium.Script.png</PackageIcon>
     <Authors>rilliumio</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
   <ItemGroup>
-	<None Include="..\README.md" Pack="true" PackagePath="" />
-	<None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\Rillium.Script.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include=".editorconfig" />
   </ItemGroup>
-
+  <ItemGroup>
+    <EditorConfigFiles Remove=".editorconfig" />
+  </ItemGroup>
 </Project>

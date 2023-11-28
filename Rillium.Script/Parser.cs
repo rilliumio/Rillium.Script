@@ -259,6 +259,10 @@ namespace Rillium.Script
             var increment = this.ParseStatement(scope);
             this.Eat(TokenId.RightParen);
             var body = this.ParseBlockStatement(scope);
+
+            init.ShouldNotBeNull();
+            increment.ShouldNotBeNull();
+
             return new ForLoopStatement(init, condition, increment, body);
         }
 

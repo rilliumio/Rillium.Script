@@ -5,7 +5,7 @@
 [![Documentation](https://img.shields.io/badge/wiki-documentation-forestgreen)](https://github.com/rilliumio/Rillium.Script/wiki)
 ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-96%25-forestgreen?style=flat)
 
-Rillium.Script was created to provide safe scripting functionality that could be modified at runtime without the need to recompile or re-deploy your application.
+Rillium.Script provides safe scripting functionality that can be modified at runtime without the need to recompile or re-deploy your application.
 
 Rillium.Script is designed to resemble a simplified version of C#, making it familiar to users already comfortable with C-style languages.
 
