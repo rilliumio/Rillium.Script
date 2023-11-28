@@ -25,23 +25,15 @@ namespace Rillium.Script
 
         private static LiteralTypeId Convert(TokenId tokenId)
         {
-            switch (tokenId)
+            return tokenId switch
             {
-                case TokenId.True:
-                case TokenId.False:
-                    return LiteralTypeId.Bool;
-
-                case TokenId.Number:
-                    return LiteralTypeId.Number;
-
-                case TokenId.String:
-                    return LiteralTypeId.String;
-
-                default:
-                    throw new ArgumentException(
-                    $"Invalid token {tokenId}. Cannot " +
-                    $"convert to {nameof(LiteralTypeId)}.");
-            }
+                TokenId.True or TokenId.False => LiteralTypeId.Bool,
+                TokenId.Number => LiteralTypeId.Number,
+                TokenId.String => LiteralTypeId.String,
+                _ => throw new ArgumentException(
+                                    $"Invalid token {tokenId}. Cannot " +
+                                    $"convert to {nameof(LiteralTypeId)}."),
+            };
         }
 
         public static bool EvaluateToBool(this Expression ex, Scope scope)
