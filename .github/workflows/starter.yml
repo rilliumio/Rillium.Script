@@ -46,7 +46,7 @@ jobs:
       - name: Copy Coverage to Predictable Location
         run: |
           mkdir -p coverage
-          cp coverage/*/coverage.cobertura.xml coverage/coverage.cobertura.xml
+          cp coverage/*/coverage.cobertura.xml coverage/
 
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
