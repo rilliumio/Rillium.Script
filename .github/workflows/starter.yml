@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ["6.0.x"]
+        dotnet-version: ["6.0.x", "8.0.x"]
 
     steps:
       - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
         shell: pwsh
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
@@ -39,7 +39,9 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
+        run: |
+          dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
+          dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage --framework net8.0
 
       - name: Copy Coverage to Predictable Location
         run: cp coverage/*/coverage.cobertura.xml coverage/coverage.cobertura.xml
@@ -53,6 +55,7 @@ jobs:
           format: "markdown"
           output: "both"
           thresholds: "95 75"
+          framework: "net6.0,net8.0"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
