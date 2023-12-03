@@ -20,7 +20,7 @@ int b = Evaluator.Evaluate<int>("var b = 4 + 3 * 2; b;");  // 10
 double c = Evaluator.Evaluate<double>("Log(1.5)");         // 0.4054651081081644
 ```
 
-Try it out: https://dotnetfiddle.net/TTyRPO
+Try it out: https://dotnetfiddle.net/KfzpMV
 
 ## Documentation
 Refer to the documentation to get started with variables, loops, if-else statements, conditionals, and other essential features.

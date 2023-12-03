@@ -8,7 +8,7 @@
     <Title>A math parser and script evaluator.</Title>
     <PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
-    <Version>0.1.2</Version>
+    <Version>0.2.2</Version>
     <PackageTags>script; math; parser; parse; dotnet; evaluator; eval; scripting; evaluation;</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>A simple, fast, and secure math parser and runtime script evaluation with syntax similar to C#.</Description>
