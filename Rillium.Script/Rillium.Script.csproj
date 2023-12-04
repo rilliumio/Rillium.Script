@@ -1,31 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Company>rillium.io</Company>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>A math parser and script evaluator.</Title>
-    <PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
-    <Version>0.2.2</Version>
-    <PackageTags>script; math; parser; parse; dotnet; evaluator; eval; scripting; evaluation;</PackageTags>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Description>A simple, fast, and secure math parser and runtime script evaluation with syntax similar to C#.</Description>
-    <PackageIcon>Rillium.Script.png</PackageIcon>
-    <Authors>rilliumio</Authors>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="" />
-    <None Include="..\LICENSE" Pack="true" PackagePath="" />
-    <None Include="..\Rillium.Script.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include=".editorconfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <EditorConfigFiles Remove=".editorconfig" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+		<IsPackable>true</IsPackable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Company>rillium.io</Company>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>A math parser and script evaluator.</Title>
+		<PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
+		<Version>0.2.3</Version>
+		<PackageTags>script; math; parser; parse; dotnet; evaluator; eval; scripting; evaluation;</PackageTags>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<Description>A simple, fast, and secure math parser and runtime script evaluation with syntax similar to C#.</Description>
+		<PackageIcon>Rillium.Script.png</PackageIcon>
+		<Authors>rilliumio</Authors>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="" />
+		<None Include="..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="..\Rillium.Script.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include=".editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+		<EditorConfigFiles Remove=".editorconfig" />
+	</ItemGroup>
 </Project>
