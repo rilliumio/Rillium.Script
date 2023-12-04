@@ -3,6 +3,7 @@
 		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
 		<IsPackable>true</IsPackable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Nullable>enable</Nullable>
 		<Company>rillium.io</Company>
 		<Title>A math parser and script evaluator.</Title>
