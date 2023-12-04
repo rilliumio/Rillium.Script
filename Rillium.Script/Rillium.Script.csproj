@@ -5,7 +5,6 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Company>rillium.io</Company>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>A math parser and script evaluator.</Title>
 		<PackageProjectUrl>https://github.com/rilliumio/Rillium.Script</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/rilliumio/Rillium.Script</RepositoryUrl>
