@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ["6.0.x", "8.0.x"]
+        dotnet-version: ["8.0.x"]
 
     steps:
       - uses: actions/checkout@v3
@@ -41,7 +41,6 @@ jobs:
       - name: Test
         run: |
           dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
-          dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory coverage --framework net8.0
 
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
@@ -52,7 +51,7 @@ jobs:
           format: "markdown"
           output: "both"
           thresholds: "95 75"
-          framework: "net6.0,net8.0"
+          framework: "net8.0"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
