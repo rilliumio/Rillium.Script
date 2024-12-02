@@ -96,6 +96,14 @@ namespace Rillium.Script
                 var rightExpr = this.ParseTerm();
                 leftExpr = new BinaryExpression(leftExpr, op, rightExpr);
             }
+
+            if (this.currentToken.Id == TokenId.Question)
+            {
+                var questionToken = this.currentToken;
+                this.Eat(TokenId.Question);
+                return ParseTernary(leftExpr, questionToken);
+            }
+
             return leftExpr;
         }
 
@@ -286,6 +294,7 @@ namespace Rillium.Script
                 return expr;
             }
 
+
             while (this.currentToken.Id == TokenId.Plus ||
                    this.currentToken.Id == TokenId.Minus ||
                    this.currentToken.Id == TokenId.Star ||
@@ -295,16 +304,42 @@ namespace Rillium.Script
                    this.currentToken.Id == TokenId.Less ||
                    this.currentToken.Id == TokenId.LessEqual ||
                    this.currentToken.Id == TokenId.Greater ||
-                   this.currentToken.Id == TokenId.GreaterEqual)
+                   this.currentToken.Id == TokenId.GreaterEqual ||
+                   this.currentToken.Id == TokenId.Question ||
+                   this.currentToken.Id == TokenId.Colon)
             {
                 var op = this.currentToken;
                 this.Eat(op.Id);
+
+                if (op.Id == TokenId.Question)
+                {
+                    return ParseTernary(expr, op);
+                }
 
                 var right = this.ParseToRight(this.ParsePrimaryExpression());
                 expr = new BinaryExpression(expr, op, right);
             }
 
             return expr;
+        }
+
+        private Expression ParseTernary(Expression? expr, Token op)
+        {
+            var condition = ParseToRight(expr);
+            var right = this.ParsePrimaryExpression();
+            this.Eat(TokenId.Colon);
+            var left = this.ParsePrimaryExpression();
+
+            if (right == null || left == null)
+            {
+                throw new ScriptException($"Invalid ternary expression: {this.currentToken.Id}");
+            }
+
+            return new TernaryExpression(
+                op,
+                condition,
+                right,
+                left);
         }
 
         private Expression? ParsePrimaryExpression()

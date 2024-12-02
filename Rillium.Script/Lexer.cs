@@ -143,6 +143,18 @@ namespace Rillium.Script
                     return new Token(TokenId.Semicolon, ";", this.lineNumber);
                 }
 
+                if (currentChar == '?')
+                {
+                    this.ConsumeChar();
+                    return new Token(TokenId.Question, "?", this.lineNumber);
+                }
+
+                if (currentChar == ':')
+                {
+                    this.ConsumeChar();
+                    return new Token(TokenId.Colon, ":", this.lineNumber);
+                }
+
                 if (currentChar == '=')
                 {
                     this.ConsumeChar();
