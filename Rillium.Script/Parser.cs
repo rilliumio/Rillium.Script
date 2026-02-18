@@ -20,45 +20,34 @@ namespace Rillium.Script
             this.currentToken = lexer.NextToken();
         }
 
-        public object? Parse(params object[]? args)
+        public List<Statement> BuildStatements()
         {
-            var scope = new Scope(this.functions);
-            scope.InitializeScopeArguments(args);
+            var statements = new List<Statement>();
 
             while (true)
             {
                 this.EatSemiColons();
                 if (this.currentToken.Id == TokenId.Eof) { break; }
 
-                var statement = this.ParseStatement(scope);
-                if (statement is ReturnStatement returnStatement)
-                {
-                    return returnStatement.EvaluateReturnExpression(scope);
-                }
+                var statement = this.ParseStatement();
+                if (statement == null) { break; }
 
-                try
-                {
-                    statement.Execute(scope);
-                }
-                catch (ReturnStatementException returnStatementException)
-                {
-                    return returnStatementException.returnStatement.EvaluateReturnExpression(scope);
-                }
+                statements.Add(statement);
 
-                if (this.currentToken.Id == TokenId.Eof || statement == null) { break; }
+                if (this.currentToken.Id == TokenId.Eof) { break; }
                 this.EatSemiColons();
-
             }
 
-            this.ouput.Flush();
+            return statements;
+        }
 
-            if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
-            {
-                if (outputValue is Expression ex) { return ex.Evaluate(scope); }
-                return outputValue;
-            }
+        public object? Parse(params object[]? args)
+        {
+            var scope = new Scope(this.functions);
+            scope.InitializeScopeArguments(args);
 
-            return null;
+            var statements = this.BuildStatements();
+            return CompiledScript.Execute(statements, scope, this.ouput);
         }
 
         private void EatSemiColons()
@@ -199,12 +188,10 @@ namespace Rillium.Script
             }
         }
 
-        private DeclarationStatement ParseDeclarationStatement(Scope scope)
+        private DeclarationStatement ParseDeclarationStatement()
         {
             this.Eat(TokenId.Var);
             var identifier = this.currentToken;
-
-            scope.Set(identifier.Value, null);
 
             this.Eat(TokenId.Identifier);
 
@@ -237,7 +224,7 @@ namespace Rillium.Script
         }
 
         // Parse an if statement
-        private IfStatement ParseIfStatement(Scope scope)
+        private IfStatement ParseIfStatement()
         {
             this.Eat(TokenId.If);
             this.Eat(TokenId.LeftParen);
@@ -245,28 +232,28 @@ namespace Rillium.Script
             this.Eat(TokenId.RightParen);
 
 
-            var thenStatement = this.ParseBlockStatement(scope);
+            var thenStatement = this.ParseBlockStatement();
             Statement? elseStatement = null;
             if (this.currentToken.Id == TokenId.Else)
             {
                 this.Eat(TokenId.Else);
-                elseStatement = this.ParseBlockStatement(scope);
+                elseStatement = this.ParseBlockStatement();
             }
             return new IfStatement(condition, thenStatement, elseStatement);
         }
 
         // Parse a for loop statement
-        private ForLoopStatement ParseForLoopStatement(Scope scope)
+        private ForLoopStatement ParseForLoopStatement()
         {
             this.Eat(TokenId.For);
             this.Eat(TokenId.LeftParen);
-            var init = this.ParseStatement(scope);
+            var init = this.ParseStatement();
             this.EatSemiColons();
             var condition = this.ParseExpression();
             this.EatSemiColons();
-            var increment = this.ParseStatement(scope);
+            var increment = this.ParseStatement();
             this.Eat(TokenId.RightParen);
-            var body = this.ParseBlockStatement(scope);
+            var body = this.ParseBlockStatement();
 
             init.ShouldNotBeNull();
             increment.ShouldNotBeNull();
@@ -436,7 +423,7 @@ namespace Rillium.Script
             return new ArrayExpression(this.currentToken, expressionList);
         }
 
-        private BlockStatement ParseBlockStatement(Scope scope)
+        private BlockStatement ParseBlockStatement()
         {
             var statements = new List<Statement>();
 
@@ -447,7 +434,7 @@ namespace Rillium.Script
                 this.currentToken.Id != TokenId.Semicolon &&
                 this.currentToken.Id != TokenId.Eof)
             {
-                statements.Add(this.ParseStatement(scope)!);
+                statements.Add(this.ParseStatement()!);
             }
 
             this.EatSemiColons();
@@ -457,18 +444,18 @@ namespace Rillium.Script
         }
 
         // Parse a statement
-        private Statement? ParseStatement(Scope scope)
+        private Statement? ParseStatement()
         {
             switch (this.currentToken.Id)
             {
                 case TokenId.Var:
-                    return this.ParseDeclarationStatement(scope);
+                    return this.ParseDeclarationStatement();
                 case TokenId.If:
-                    return this.ParseIfStatement(scope);
+                    return this.ParseIfStatement();
                 case TokenId.LeftBrace:
-                    return this.ParseBlockStatement(scope);
+                    return this.ParseBlockStatement();
                 case TokenId.For:
-                    return this.ParseForLoopStatement(scope);
+                    return this.ParseForLoopStatement();
                 case TokenId.Identifier:
                 case TokenId.PlusPlus:
                 case TokenId.MinusMinus:
