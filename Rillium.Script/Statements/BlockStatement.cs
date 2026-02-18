@@ -1,4 +1,4 @@
-﻿namespace Rillium.Script.Statements
+namespace Rillium.Script.Statements
 {
     internal class BlockStatement : Statement
     {
@@ -14,6 +14,14 @@
             foreach (var statement in Statements)
             {
                 statement.Execute(scope);
+            }
+        }
+
+        public override async Task ExecuteAsync(Scope scope)
+        {
+            foreach (var statement in Statements)
+            {
+                await statement.ExecuteAsync(scope);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Rillium.Script.Expressions
+namespace Rillium.Script.Expressions
 {
     internal abstract class Expression
     {
@@ -11,5 +11,10 @@
         }
 
         public abstract Expression Evaluate(Scope scope);
+
+        public virtual Task<Expression> EvaluateAsync(Scope scope)
+        {
+            return Task.FromResult(this.Evaluate(scope));
+        }
     }
 }

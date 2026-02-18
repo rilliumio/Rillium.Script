@@ -18,6 +18,121 @@ namespace Rillium.Script
         public T? Evaluate<T>(params object[]? args)
         {
             var (result, console) = this.Run(args);
+            return ConvertResult<T>(result);
+        }
+
+        public async Task<T?> EvaluateAsync<T>(params object[]? args)
+        {
+            var (result, console) = await this.RunAsync(args);
+            return ConvertResult<T>(result);
+        }
+
+        public (object? output, string console) Run(params object[]? args)
+        {
+            using var memoryStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memoryStream);
+
+            var output = this.Run(streamWriter, args);
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            using var streamReader = new StreamReader(memoryStream);
+
+            return (output, streamReader.ReadToEnd());
+        }
+
+        public async Task<(object? output, string console)> RunAsync(params object[]? args)
+        {
+            using var memoryStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memoryStream);
+
+            var output = await this.RunAsync(streamWriter, args);
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            using var streamReader = new StreamReader(memoryStream);
+
+            return (output, streamReader.ReadToEnd());
+        }
+
+        public object? Run(StreamWriter output, params object[]? args)
+        {
+            var scope = new Scope(this.functions);
+            scope.InitializeScopeArguments(args);
+
+            return Execute(this.statements, scope, output);
+        }
+
+        public async Task<object?> RunAsync(StreamWriter output, params object[]? args)
+        {
+            var scope = new Scope(this.functions);
+            scope.InitializeScopeArguments(args);
+
+            return await ExecuteAsync(this.statements, scope, output);
+        }
+
+        internal static object? Execute(List<Statement> statements, Scope scope, StreamWriter output)
+        {
+            foreach (var statement in statements)
+            {
+                if (statement is ReturnStatement returnStatement)
+                {
+                    return returnStatement.EvaluateReturnExpression(scope);
+                }
+
+                try
+                {
+                    statement.Execute(scope);
+                }
+                catch (ReturnStatementException returnStatementException)
+                {
+                    return returnStatementException.returnStatement.EvaluateReturnExpression(scope);
+                }
+            }
+
+            output.Flush();
+
+            if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
+            {
+                if (outputValue is Expression ex) { return ex.Evaluate(scope); }
+                return outputValue;
+            }
+
+            return null;
+        }
+
+        internal static async Task<object?> ExecuteAsync(List<Statement> statements, Scope scope, StreamWriter output)
+        {
+            foreach (var statement in statements)
+            {
+                if (statement is ReturnStatement returnStatement)
+                {
+                    return await returnStatement.EvaluateReturnExpressionAsync(scope);
+                }
+
+                try
+                {
+                    await statement.ExecuteAsync(scope);
+                }
+                catch (ReturnStatementException returnStatementException)
+                {
+                    return await returnStatementException.returnStatement.EvaluateReturnExpressionAsync(scope);
+                }
+            }
+
+            output.Flush();
+
+            if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
+            {
+                if (outputValue is Expression ex) { return await ex.EvaluateAsync(scope); }
+                return outputValue;
+            }
+
+            return null;
+        }
+
+        private static T? ConvertResult<T>(object? result)
+        {
             if (result is T t) { return t; }
             var typeT = typeof(T);
 
@@ -78,58 +193,6 @@ namespace Rillium.Script
             return (result == null)
                 ? throw new ArgumentException($"Could not convert null output to type '{typeT.Name}'")
                 : throw new ArgumentException($"Could not convert output type '{result.GetType().Name}' to type '{typeT.Name}'");
-        }
-
-        public (object? output, string console) Run(params object[]? args)
-        {
-            using var memoryStream = new MemoryStream();
-            using var streamWriter = new StreamWriter(memoryStream);
-
-            var output = this.Run(streamWriter, args);
-
-            memoryStream.Seek(0, SeekOrigin.Begin);
-
-            using var streamReader = new StreamReader(memoryStream);
-
-            return (output, streamReader.ReadToEnd());
-        }
-
-        public object? Run(StreamWriter output, params object[]? args)
-        {
-            var scope = new Scope(this.functions);
-            scope.InitializeScopeArguments(args);
-
-            return Execute(this.statements, scope, output);
-        }
-
-        internal static object? Execute(List<Statement> statements, Scope scope, StreamWriter output)
-        {
-            foreach (var statement in statements)
-            {
-                if (statement is ReturnStatement returnStatement)
-                {
-                    return returnStatement.EvaluateReturnExpression(scope);
-                }
-
-                try
-                {
-                    statement.Execute(scope);
-                }
-                catch (ReturnStatementException returnStatementException)
-                {
-                    return returnStatementException.returnStatement.EvaluateReturnExpression(scope);
-                }
-            }
-
-            output.Flush();
-
-            if (scope.TryGet(Constants.OutputValueKey, out var outputValue))
-            {
-                if (outputValue is Expression ex) { return ex.Evaluate(scope); }
-                return outputValue;
-            }
-
-            return null;
         }
     }
 }

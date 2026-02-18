@@ -1,4 +1,4 @@
-﻿namespace Rillium.Script.Expressions
+namespace Rillium.Script.Expressions
 {
     internal class TernaryExpression : Expression
     {
@@ -22,6 +22,14 @@
         {
             var con = this.Condition.Evaluate(scope);
             return (con.EvaluateToBool(scope)) ? this.Left.Evaluate(scope) : this.Right.Evaluate(scope);
+        }
+
+        public override async Task<Expression> EvaluateAsync(Scope scope)
+        {
+            var con = await this.Condition.EvaluateAsync(scope);
+            return (con.EvaluateToBool(scope))
+                ? await this.Left.EvaluateAsync(scope)
+                : await this.Right.EvaluateAsync(scope);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Exceptions;
 using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
@@ -21,6 +21,23 @@ namespace Rillium.Script.Statements
                 if (literalExpression.Value.TypeId == LiteralTypeId.UnAssigned)
                 {
 
+                    throw new ScriptException(
+                      $"Line {literalExpression.Token.Line + 1}. " +
+                      string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, expression.Token.Value));
+                }
+            }
+
+            return expression;
+        }
+
+        public async Task<Expression> EvaluateReturnExpressionAsync(Scope scope)
+        {
+            var expression = await this.value.EvaluateAsync(scope);
+
+            if (expression is LiteralExpression literalExpression)
+            {
+                if (literalExpression.Value.TypeId == LiteralTypeId.UnAssigned)
+                {
                     throw new ScriptException(
                       $"Line {literalExpression.Token.Line + 1}. " +
                       string.Format(Constants.ExceptionMessages.UnassignedLocalVariable, expression.Token.Value));
