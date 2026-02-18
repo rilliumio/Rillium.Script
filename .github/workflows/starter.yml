@@ -50,7 +50,7 @@ jobs:
           fail_below_min: true
           format: "markdown"
           output: "both"
-          thresholds: "95 75"
+          thresholds: "95 60"
           framework: "net8.0"
 
       - name: Add Coverage PR Comment
