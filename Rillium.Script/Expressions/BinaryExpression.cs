@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Exceptions;
 
 namespace Rillium.Script.Expressions
 {
@@ -21,7 +21,18 @@ namespace Rillium.Script.Expressions
         {
             var left = this.Left.Evaluate(scope);
             var right = this.Right.Evaluate(scope);
+            return this.EvaluateCore(left, right, scope);
+        }
 
+        public override async Task<Expression> EvaluateAsync(Scope scope)
+        {
+            var left = await this.Left.EvaluateAsync(scope);
+            var right = await this.Right.EvaluateAsync(scope);
+            return this.EvaluateCore(left, right, scope);
+        }
+
+        private Expression EvaluateCore(Expression left, Expression right, Scope scope)
+        {
             if (left is NumberExpression leftNumberExpression)
             {
                 if (right is NumberExpression rightNumberExpression)

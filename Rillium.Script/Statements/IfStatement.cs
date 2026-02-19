@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Expressions;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
@@ -24,6 +24,18 @@ namespace Rillium.Script.Statements
             else if (ElseStatement != null)
             {
                 ElseStatement.Execute(scope);
+            }
+        }
+
+        public override async Task ExecuteAsync(Scope scope)
+        {
+            if (await Condition.EvaluateToBoolAsync(scope))
+            {
+                await ThenStatement.ExecuteAsync(scope);
+            }
+            else if (ElseStatement != null)
+            {
+                await ElseStatement.ExecuteAsync(scope);
             }
         }
     }

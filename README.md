@@ -22,6 +22,34 @@ double c = Evaluator.Evaluate<double>("Log(1.5)");         // 0.4054651081081644
 
 Try it out: https://dotnetfiddle.net/KfzpMV
 
+## Custom Functions
+
+Register your own functions.
+
+```ts
+// Sync function
+var options = new ScriptOptions()
+    .AddFunction("tax", (double price) => price * 0.08);
+
+double total = Evaluator.Evaluate<double>("tax(120) + 120;", options);  // 129.6
+```
+
+```ts
+// Async function - use EvaluateAsync / RunAsync
+var options = new ScriptOptions()
+    .AddFunctionAsync("getInventory", async (int productId) =>
+    {
+        int count = await warehouse.GetStockCountAsync(productId);
+        return count;
+    });
+
+// Script uses the async result just like any other value
+int count = await Evaluator.EvaluateAsync<int>(
+    "var c = getInventory(42); c > 0 ? c : 0;", options);
+```
+
+> Calling an async-registered function via the sync `Evaluate` / `Run` path throws `AsyncFunctionCalledSynchronouslyException`.
+
 ## Documentation
 Refer to the documentation to get started with variables, loops, if-else statements, conditionals, and other essential features.
 

@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Expressions;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
@@ -34,6 +34,17 @@ namespace Rillium.Script.Statements
 
                 // Evaluate the increment expression
                 Iteration.Execute(scope);
+            }
+        }
+
+        public override async Task ExecuteAsync(Scope scope)
+        {
+            await Initialization.ExecuteAsync(scope);
+
+            while (await Condition.EvaluateToBoolAsync(scope))
+            {
+                await Body.ExecuteAsync(scope);
+                await Iteration.ExecuteAsync(scope);
             }
         }
     }

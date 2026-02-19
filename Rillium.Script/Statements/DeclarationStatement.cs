@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Expressions;
+using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
 {
@@ -21,6 +21,12 @@ namespace Rillium.Script.Statements
             var value = Initializer != null ? Initializer.Evaluate(scope) : null;
 
             // Add the variable to the current scope
+            scope.Set(Identifier.Value, value);
+        }
+
+        public override async Task ExecuteAsync(Scope scope)
+        {
+            var value = Initializer != null ? await Initializer.EvaluateAsync(scope) : null;
             scope.Set(Identifier.Value, value);
         }
     }

@@ -8,5 +8,8 @@
         public LiteralTypeId Out { get; set; }
 
         public Func<dynamic, dynamic> Function { get; set; }
+
+        public bool IsAsync { get; set; }
+        public Func<dynamic, Task<dynamic>>? AsyncFunction { get; set; }
     }
 }

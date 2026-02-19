@@ -52,6 +52,20 @@ namespace Rillium.Script
             }
         }
 
+        public static async Task<bool> EvaluateToBoolAsync(this Expression ex, Scope scope)
+        {
+            var e = await ex.EvaluateAsync(scope);
+
+            if (e is LiteralExpression le && le.Value.TypeId == LiteralTypeId.Bool)
+            {
+                return le.Value.Value is true;
+            }
+
+            if (e is NumberExpression ne) { return IsTrue(ne.Value); }
+
+            return e.EvaluateToBool(scope);
+        }
+
         public static double EvaluateToDouble(this Expression ex, Scope scope)
         {
             var e = ex;
@@ -79,6 +93,15 @@ namespace Rillium.Script
             switch (literalTypeId)
             {
                 case LiteralTypeId.Number: return EvaluateToDouble(ex, scope);
+                case LiteralTypeId.String:
+                {
+                    Expression e = ex.Evaluate(scope);
+                    if (e is LiteralExpression le && le.Value.TypeId == LiteralTypeId.String)
+                        return (string)le.Value.Value!;
+                    throw new ScriptException($"Line {ex.Token.Line + 1}. Cannot convert expression to string.");
+                }
+                case LiteralTypeId.Bool:
+                    return ex.EvaluateToBool(scope);
                 default: throw new NotImplementedException($"Expression conversion to {nameof(literalTypeId)} '{literalTypeId}' not implemented.");
             }
         }

@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Exceptions;
 
 namespace Rillium.Script.Expressions
 {
@@ -28,6 +28,17 @@ namespace Rillium.Script.Expressions
             }
 
             scope.Set(Target.Name.Value, Value.Evaluate(scope));
+        }
+
+        public async Task SetAsync(Scope scope)
+        {
+            if (!scope.HasVariable(Target.Name.Value))
+            {
+                Token.ThrowScriptException<BadNameException>(
+                    string.Format(Constants.ExceptionMessages.NameDoesNotExist, Target.Name.Value));
+            }
+
+            scope.Set(Target.Name.Value, await Value.EvaluateAsync(scope));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Rillium.Script.Exceptions;
+using Rillium.Script.Exceptions;
 using Rillium.Script.Expressions;
 
 namespace Rillium.Script.Statements
@@ -15,13 +15,35 @@ namespace Rillium.Script.Statements
         public override void Execute(Scope scope)
         {
             var e = this.Expression.Evaluate(scope);
+            this.HandleEvaluated(e, scope);
+        }
 
+        public override async Task ExecuteAsync(Scope scope)
+        {
+            var e = await this.Expression.EvaluateAsync(scope);
+
+            if (e is AssignmentExpression ae)
+            {
+                await ae.SetAsync(scope);
+                return;
+            }
+
+            this.HandleEvaluatedNonAssignment(e, scope);
+        }
+
+        private void HandleEvaluated(Expression e, Scope scope)
+        {
             if (e is AssignmentExpression ae)
             {
                 ae.Set(scope);
                 return;
             }
 
+            this.HandleEvaluatedNonAssignment(e, scope);
+        }
+
+        private void HandleEvaluatedNonAssignment(Expression e, Scope scope)
+        {
             if (e is NumberExpression ne)
             {
                 scope.Set(Constants.OutputValueKey, ne.Value);
