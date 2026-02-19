@@ -24,7 +24,7 @@ Try it out: https://dotnetfiddle.net/KfzpMV
 
 ## Custom Functions
 
-Register your own functions with typed generics — no casts required.
+Register your own functions.
 
 ```ts
 // Sync function
@@ -35,7 +35,7 @@ double total = Evaluator.Evaluate<double>("tax(120) + 120;", options);  // 129.6
 ```
 
 ```ts
-// Async function — use EvaluateAsync / RunAsync
+// Async function - use EvaluateAsync / RunAsync
 var options = new ScriptOptions()
     .AddFunctionAsync("getInventory", async (int productId) =>
     {
