@@ -1,3 +1,5 @@
+using Rillium.Script.Exceptions;
+
 namespace Rillium.Script.Expressions
 {
     internal class FunctionExpression : Expression
@@ -16,6 +18,13 @@ namespace Rillium.Script.Expressions
         public override Expression Evaluate(Scope scope)
         {
             var f = scope.GetFunction(this.Name, this.Arguments.Count);
+
+            if (f.IsAsync)
+            {
+                throw new AsyncFunctionCalledSynchronouslyException(
+                    $"Line {this.Token.Line + 1}. " +
+                    $"Function '{f.Name}' is async. Use EvaluateAsync() or RunAsync() instead.");
+            }
 
             var functionArguments = new List<object>();
             for (var i = 0; i < this.Arguments.Count; i++)
@@ -45,6 +54,12 @@ namespace Rillium.Script.Expressions
 
             if (f.IsAsync && f.AsyncFunction != null)
             {
+                if (f.Out == LiteralTypeId.Null)
+                {
+                    await f.AsyncFunction.Invoke(input);
+                    return this.Token.BuildLiteralExpression(LiteralTypeId.Null, null);
+                }
+
                 var result = await f.AsyncFunction.Invoke(input);
                 if (f.Out == LiteralTypeId.Number)
                 {
@@ -60,12 +75,17 @@ namespace Rillium.Script.Expressions
 
         private Expression InvokeSync(FunctionInfo f, List<object> functionArguments)
         {
+            var input = f.ArgumentTokens.Count == 1 ? functionArguments.First() : (dynamic)functionArguments;
+
+            if (f.Out == LiteralTypeId.Null)
+            {
+                f.Function?.Invoke(input);
+                return this.Token.BuildLiteralExpression(LiteralTypeId.Null, null);
+            }
+
             if (f.Out == LiteralTypeId.Number)
             {
-                return new NumberExpression(this.Token, f.Function?.Invoke(
-                       f.ArgumentTokens.Count == 1 ?
-                       functionArguments.First() :
-                       functionArguments));
+                return new NumberExpression(this.Token, f.Function?.Invoke(input));
             }
 
             throw new NotImplementedException($"Evaluation of function '{f.Name}' with return type of '{f.Out}' not implemented.");

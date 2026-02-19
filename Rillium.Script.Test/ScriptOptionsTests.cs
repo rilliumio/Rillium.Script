@@ -10,7 +10,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_SingleArg_ReturnsResult()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1);
+                .AddFunction("double", (double x) => x * 2);
 
             var result = Evaluator.Evaluate<int>("double(5);", options);
 
@@ -21,7 +21,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_TwoArgs_PassesArgumentsCorrectly()
         {
             var options = new ScriptOptions()
-                .AddFunction("add", (args) => (double)args[0] + (double)args[1], argumentCount: 2);
+                .AddFunction("add", (double x, double y) => x + y);
 
             var result = Evaluator.Evaluate<int>("add(3, 7);", options);
 
@@ -32,7 +32,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_InArithmeticExpression()
         {
             var options = new ScriptOptions()
-                .AddFunction("triple", (args) => (double)args * 3, argumentCount: 1);
+                .AddFunction("triple", (double x) => x * 3);
 
             var result = Evaluator.Evaluate<int>("triple(3) + 10;", options);
 
@@ -43,7 +43,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_AsArgumentToBuiltIn()
         {
             var options = new ScriptOptions()
-                .AddFunction("negate", (args) => -(double)args, argumentCount: 1);
+                .AddFunction("negate", (double x) => -x);
 
             var result = Evaluator.Evaluate<int>("Abs(negate(5));", options);
 
@@ -62,7 +62,7 @@ namespace Rillium.Script.Test
         public void ScriptOptions_ReusableAcrossMultipleCompiles()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1);
+                .AddFunction("double", (double x) => x * 2);
 
             var result1 = Evaluator.Evaluate<int>("double(5);", options);
             var result2 = Evaluator.Evaluate<int>("double(10);", options);
@@ -82,7 +82,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_InVarDeclaration()
         {
             var options = new ScriptOptions()
-                .AddFunction("square", (args) => (double)args * (double)args, argumentCount: 1);
+                .AddFunction("square", (double x) => x * x);
 
             var result = Evaluator.Evaluate<int>("var x = square(4); x;", options);
 
@@ -93,7 +93,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_InForLoop()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1);
+                .AddFunction("double", (double x) => x * 2);
 
             var result = Evaluator.Evaluate<int>(
                 "var sum = 0; for (var i = 0; i < 3; i++) { sum = sum + double(i); } sum;", options);
@@ -106,7 +106,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_InIfCondition()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1);
+                .AddFunction("double", (double x) => x * 2);
 
             var result = Evaluator.Evaluate<int>(
                 "var x = 0; if (double(5) > 8) { x = 1; } else { x = 2; } x;", options);
@@ -118,7 +118,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_NestedCalls()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1);
+                .AddFunction("double", (double x) => x * 2);
 
             var result = Evaluator.Evaluate<int>("double(double(3));", options);
 
@@ -129,7 +129,7 @@ namespace Rillium.Script.Test
         public void CustomFunction_WithReturn()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1);
+                .AddFunction("double", (double x) => x * 2);
 
             var result = Evaluator.Evaluate<int>("return double(7);", options);
 
@@ -140,13 +140,84 @@ namespace Rillium.Script.Test
         public void CustomFunction_MultipleFunctionsRegistered()
         {
             var options = new ScriptOptions()
-                .AddFunction("double", (args) => (double)args * 2, argumentCount: 1)
-                .AddFunction("add", (args) => (double)args[0] + (double)args[1], argumentCount: 2);
+                .AddFunction("double", (double x) => x * 2)
+                .AddFunction("add", (double x, double y) => x + y);
 
             var result = Evaluator.Evaluate<int>("add(double(3), double(4));", options);
 
             // double(3)=6, double(4)=8, add(6,8)=14
             Assert.AreEqual(14, result);
+        }
+
+        [TestMethod]
+        public void AddAction_ZeroArgs_SideEffectExecuted()
+        {
+            bool executed = false;
+            var options = new ScriptOptions()
+                .AddAction("doSomething", () => { executed = true; });
+
+            Evaluator.Evaluate<int>("doSomething(); 0;", options);
+
+            Assert.IsTrue(executed);
+        }
+
+        [TestMethod]
+        public void AddAction_SingleArg_SideEffectExecuted()
+        {
+            double captured = 0;
+            var options = new ScriptOptions()
+                .AddAction("capture", (double x) => { captured = x; });
+
+            Evaluator.Evaluate<int>("capture(42); 0;", options);
+
+            Assert.AreEqual(42.0, captured);
+        }
+
+        [TestMethod]
+        public void AddAction_TwoArgs_SideEffectExecuted()
+        {
+            double sum = 0;
+            var options = new ScriptOptions()
+                .AddAction("addSideEffect", (double x, double y) => { sum = x + y; });
+
+            Evaluator.Evaluate<int>("addSideEffect(3, 7); 0;", options);
+
+            Assert.AreEqual(10.0, sum);
+        }
+
+        [TestMethod]
+        public void AsyncFunction_CalledViaSyncEvaluate_ThrowsAsyncFunctionCalledSynchronouslyException()
+        {
+            var options = new ScriptOptions()
+                .AddFunctionAsync("asyncFunc", async (double x) =>
+                {
+                    await Task.Delay(1);
+                    return x * 2;
+                });
+
+            Assert.ThrowsException<AsyncFunctionCalledSynchronouslyException>(() =>
+                Evaluator.Evaluate<int>("asyncFunc(5);", options));
+        }
+
+        [TestMethod]
+        public void AsyncFunction_CalledViaSyncRun_ThrowsAsyncFunctionCalledSynchronouslyException()
+        {
+            var options = new ScriptOptions()
+                .AddFunctionAsync("asyncFunc", async (double x) =>
+                {
+                    await Task.Delay(1);
+                    return x * 2;
+                });
+
+            Assert.ThrowsException<AsyncFunctionCalledSynchronouslyException>(() =>
+                Evaluator.Run("asyncFunc(5);", options));
+        }
+
+        [TestMethod]
+        public void LiteralTypeIdResolver_UnsupportedType_ThrowsArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() =>
+                new ScriptOptions().AddFunction("bad", (object x) => x));
         }
     }
 }
