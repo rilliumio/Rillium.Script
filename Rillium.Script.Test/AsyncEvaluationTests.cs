@@ -116,6 +116,21 @@ namespace Rillium.Script.Test
         }
 
         [TestMethod]
+        public async Task AsyncFunction_InReturnStatementInt()
+        {
+            var options = new ScriptOptions()
+                .AddFunctionAsync("fetchValue", async (int i) =>
+                {
+                    await Task.Delay(1);
+                    return i + 1;
+                });
+
+            var result = await Evaluator.EvaluateAsync<int>("return fetchValue(0);", options);
+
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
         public async Task AsyncFunction_NestedAsyncCalls()
         {
             var options = new ScriptOptions()

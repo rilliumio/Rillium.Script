@@ -37,15 +37,15 @@ double total = Evaluator.Evaluate<double>("tax(120) + 120;", options);  // 129.6
 ```ts
 // Async function — use EvaluateAsync / RunAsync
 var options = new ScriptOptions()
-    .AddFunctionAsync("getInventory", async (double productId) =>
+    .AddFunctionAsync("getInventory", async (int productId) =>
     {
-        int count = await warehouse.GetStockCountAsync((int)productId);
-        return (double)count;
+        int count = await warehouse.GetStockCountAsync(productId);
+        return count;
     });
 
 // Script uses the async result just like any other value
-double qty = await Evaluator.EvaluateAsync<double>(
-    "var qty = getInventory(42); qty > 0 ? qty : 0;", options);
+int count = await Evaluator.EvaluateAsync<int>(
+    "var c = getInventory(42); c > 0 ? c : 0;", options);
 ```
 
 > Calling an async-registered function via the sync `Evaluate` / `Run` path throws `AsyncFunctionCalledSynchronouslyException`.
