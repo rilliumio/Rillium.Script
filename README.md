@@ -59,3 +59,6 @@ https://github.com/rilliumio/Rillium.Script/wiki
 If you discover bugs or deficiencies, please create a new [issue](https://github.com/rilliumio/Rillium.Script/issues) with an example script.
 
 For new feature proposals, please raise them for [discussion](https://github.com/rilliumio/Rillium.Script/discussions).
+
+---
+https://rillium.com
